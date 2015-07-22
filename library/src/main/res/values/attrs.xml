@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-
     <declare-styleable name="FontableTabPageIndicator">
-        <attr name="android:fontFamilyNormal"/>
-        <attr name="android:fontFamilySelected"/>
+        <attr name="fontFamilyNormal" format="string"/>
+        <attr name="fontFamilySelected" format="string"/>
     </declare-styleable>
 </resources>

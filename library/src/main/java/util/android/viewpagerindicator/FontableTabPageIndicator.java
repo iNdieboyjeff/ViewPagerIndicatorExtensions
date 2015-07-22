@@ -94,9 +94,9 @@ public class FontableTabPageIndicator extends HorizontalScrollView implements Pa
         final int n = a.getIndexCount();
         for (int i = 0; i < n; ++i) {
             int attr = a.getIndex(i);
-            if (attr == R.styleable.FontableTabPageIndicator_android_fontFamilyNormal) {
+            if (attr == R.styleable.FontableTabPageIndicator_fontFamilyNormal) {
                 setATypeface(normalText, a.getString(attr));
-            } else if (attr == R.styleable.FontableTabPageIndicator_android_fontFamilySelected) {
+            } else if (attr == R.styleable.FontableTabPageIndicator_fontFamilySelected) {
                 setATypeface(selectedText, a.getString(attr));
             }
             a.recycle();
