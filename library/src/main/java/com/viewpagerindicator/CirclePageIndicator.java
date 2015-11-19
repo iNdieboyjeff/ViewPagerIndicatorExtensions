@@ -23,8 +23,10 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewConfigurationCompat;
 import android.support.v4.view.ViewPager;
@@ -81,10 +83,10 @@ public class CirclePageIndicator extends View implements PageIndicator {
 
         //Load defaults from resources
         final Resources res = getResources();
-        final int defaultPageColor = res.getColor(R.color.default_circle_indicator_page_color);
-        final int defaultFillColor = res.getColor(R.color.default_circle_indicator_fill_color);
+        final int defaultPageColor = ContextCompat.getColor(context, R.color.default_circle_indicator_page_color);
+        final int defaultFillColor = ContextCompat.getColor(context, R.color.default_circle_indicator_fill_color);
         final int defaultOrientation = res.getInteger(R.integer.default_circle_indicator_orientation);
-        final int defaultStrokeColor = res.getColor(R.color.default_circle_indicator_stroke_color);
+        final int defaultStrokeColor = ContextCompat.getColor(context, R.color.default_circle_indicator_stroke_color);
         final float defaultStrokeWidth = res.getDimension(R.dimen.default_circle_indicator_stroke_width);
         final float defaultRadius = res.getDimension(R.dimen.default_circle_indicator_radius);
         final boolean defaultCentered = res.getBoolean(R.bool.default_circle_indicator_centered);
@@ -107,8 +109,11 @@ public class CirclePageIndicator extends View implements PageIndicator {
         mSnap = a.getBoolean(R.styleable.CirclePageIndicator_snap, defaultSnap);
 
         Drawable background = a.getDrawable(R.styleable.CirclePageIndicator_android_background);
-        if (background != null) {
-          setBackgroundDrawable(background);
+        if (background != null && Build.VERSION.SDK_INT < 16) {
+            //noinspection deprecation
+            setBackgroundDrawable(background);
+        } else if (background != null && Build.VERSION.SDK_INT >= 16) {
+            setBackground(background);
         }
 
         a.recycle();

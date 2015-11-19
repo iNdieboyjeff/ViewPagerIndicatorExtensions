@@ -34,7 +34,7 @@ public class LoopPagerAdapterWrapper extends PagerAdapter {
 
     private PagerAdapter mAdapter;
 
-    private SparseArray<ToDestroy> mToDestroy = new SparseArray<ToDestroy>();
+    private SparseArray<ToDestroy> mToDestroy = new SparseArray<>();
 
     private boolean mBoundaryCaching;
 
@@ -48,7 +48,7 @@ public class LoopPagerAdapterWrapper extends PagerAdapter {
 
     @Override
     public void notifyDataSetChanged() {
-        mToDestroy = new SparseArray<ToDestroy>();
+        mToDestroy = new SparseArray<>();
         super.notifyDataSetChanged();
     }
 
@@ -63,8 +63,7 @@ public class LoopPagerAdapterWrapper extends PagerAdapter {
     }
 
     public int toInnerPosition(int realPosition) {
-        int position = (realPosition + 1);
-        return position;
+        return (realPosition + 1);
     }
 
     private int getRealFirstPosition() {

@@ -89,7 +89,7 @@ public class LoopViewPager extends ViewPager {
 
     @Override
     public PagerAdapter getAdapter() {
-        return mAdapter != null ? mAdapter.getRealAdapter() : mAdapter;
+        return mAdapter != null ? mAdapter.getRealAdapter() : null;
     }
 
     @Override
@@ -112,7 +112,7 @@ public class LoopViewPager extends ViewPager {
     @Override
     public void setOnPageChangeListener(OnPageChangeListener listener) {
         mOuterPageChangeListener = listener;
-    };
+    }
 
     public LoopViewPager(Context context) {
         super(context);
