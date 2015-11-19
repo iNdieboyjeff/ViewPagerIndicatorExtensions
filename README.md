@@ -1,0 +1,3 @@
+# ViewPagerIndicatorExtensions
+Additional functionality for ViewPagerIndicator
+
