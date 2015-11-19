@@ -13,13 +13,17 @@ buildscript {
 
 }
 
+plugins {
+    id "com.jfrog.bintray" version "1.4"
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
 allprojects {
     group = 'util.android.viewpagerindicator'
-    version = '1.1'
+    version = '1.1.1'
 }
 
 repositories {
@@ -39,7 +43,6 @@ android {
         targetSdkVersion 23
         versionCode 2
         versionName version
-        project.archivesBaseName = "viewpagerindicator"
     }
     buildTypes {
         release {
@@ -57,42 +60,6 @@ dependencies {
 
 def siteUrl = 'https://github.com/iNdieboyjeff/ViewPagerIndicatorExtensions'      // Homepage URL of the library
 def gitUrl = 'https://github.com/iNdieboyjeff/ViewPagerIndicatorExtensions.git'   // Git repository URL
-
-install {
-    repositories.mavenInstaller {
-        // This generates POM.xml with proper parameters
-        pom {
-            project {
-                packaging 'jar'
-
-                // Add your description here
-                name 'ViewPagerIndicatorExtensions'
-                url siteUrl
-
-                // Set your license
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                developers {
-                    developer {
-                        id 'jeffsutton'
-                        name 'Jeff Sutton'
-                        email 'indieboy1979@gmail.com'
-                    }
-                }
-                scm {
-                    connection gitUrl
-                    developerConnection gitUrl
-                    url siteUrl
-
-                }
-            }
-        }
-    }
-}
 
 task sourcesJar(type: Jar) {
     from android.sourceSets.main.java.srcDirs
@@ -114,10 +81,16 @@ bintray {
     configurations = ['archives']
     pkg {
         repo = "maven"
+        desc = 'ViewPagerIndicator with extensions. Works with Android API 23.'
         name = "viewpagerindicator"
+        publicDownloadNumbers = true
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]
         publish = true
+        version {
+            name = '1.1.1'
+            desc = 'ViewPagerIndicator Extensions'
+        }
     }
 }

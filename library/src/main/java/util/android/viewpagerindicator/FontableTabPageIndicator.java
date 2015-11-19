@@ -52,6 +52,7 @@ public class FontableTabPageIndicator extends HorizontalScrollView implements Pa
     private Typeface normalText;
     private Typeface selectedText;
 
+
     /** Title text used when no title is provided by the adapter. */
     private static final CharSequence EMPTY_TITLE = "";
 
