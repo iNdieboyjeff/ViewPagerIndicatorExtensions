@@ -29,15 +29,13 @@ import android.view.animation.AnimationUtils;
 import com.imbryk.viewPager.LoopViewPager;
 import com.viewpagerindicator.CirclePageIndicator;
 
-import util.android.viewpagerindicator.FontableTabPageIndicator;
-
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment implements ViewPager.OnPageChangeListener, View.OnTouchListener {
 
-    LoopViewPager mPager;
-    CirclePageIndicator mIndicator;
+    private LoopViewPager mPager;
+    private CirclePageIndicator mIndicator;
 
     private static final Handler handler = new Handler();
 
@@ -63,7 +61,7 @@ public class MainActivityFragment extends Fragment implements ViewPager.OnPageCh
         mPager.setBoundaryCaching(true);
         mIndicator.setOnPageChangeListener(this);
         mPager.setOnTouchListener(this);
-        handler.postDelayed(hideRunnable, 2*CIRCLE_INDICATOR_SHOW_TIME);
+        handler.postDelayed(hideRunnable, 2 * CIRCLE_INDICATOR_SHOW_TIME);
     }
 
     @Override
@@ -89,25 +87,25 @@ public class MainActivityFragment extends Fragment implements ViewPager.OnPageCh
         return false;
     }
 
-    Runnable hideRunnable = new Runnable() {
+    private final Runnable hideRunnable = new Runnable() {
         @Override
         public void run() {
-            ((View) mIndicator).setAnimation(AnimationUtils
+            mIndicator.setAnimation(AnimationUtils
                     .loadAnimation(getContext(),
                             android.R.anim.fade_out));
-            ((View) mIndicator).setVisibility(View.GONE);
+            mIndicator.setVisibility(View.GONE);
         }
     };
 
-    Runnable showRunnable = new Runnable() {
+    private final Runnable showRunnable = new Runnable() {
         @Override
         public void run() {
             handler.removeCallbacks(hideRunnable);
-            if (((View) mIndicator).getVisibility() == View.GONE) {
-                ((View) mIndicator).setAnimation(AnimationUtils
+            if (mIndicator.getVisibility() == View.GONE) {
+                mIndicator.setAnimation(AnimationUtils
                         .loadAnimation(getContext(),
                                 android.R.anim.fade_in));
-                ((View) mIndicator).setVisibility(View.VISIBLE);
+                mIndicator.setVisibility(View.VISIBLE);
             }
             handler.postDelayed(hideRunnable, CIRCLE_INDICATOR_SHOW_TIME);
         }

@@ -12,6 +12,8 @@ import com.google.gson.annotations.SerializedName;
 public class Broadcast implements Parcelable
 {
 
+    public boolean expanded = false;
+
     @SerializedName("is_repeat")
     @Expose
     private boolean isRepeat;

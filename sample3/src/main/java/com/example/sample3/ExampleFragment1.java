@@ -19,10 +19,21 @@ package com.example.sample3;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.example.sample3.model.BBCSchedule;
+import com.google.gson.Gson;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
+import java.io.IOException;
 
 
 /**
@@ -30,17 +41,21 @@ import android.widget.TextView;
  * Use the {@link ExampleFragment1#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ExampleFragment1 extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class ExampleFragment1 extends Fragment implements Callback {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private static final OkHttpClient client = new OkHttpClient();
+    private static final Gson gson = new Gson();
+
+    private static final String CHANNEL_NAME = "channel_name";
+    private static final String SCHEDULE_LINK = "schedule_link";
+
+    private String mChannelName;
+    private String mScheduleLink;
+
+    private BBCSchedule mSchedule;
 
     private TextView message;
+    private RecyclerView scheduleList;
 
     public ExampleFragment1() {
         // Required empty public constructor
@@ -58,8 +73,8 @@ public class ExampleFragment1 extends Fragment {
     public static ExampleFragment1 newInstance(String param1, String param2) {
         ExampleFragment1 fragment = new ExampleFragment1();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(CHANNEL_NAME, param1);
+        args.putString(SCHEDULE_LINK, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -68,9 +83,12 @@ public class ExampleFragment1 extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            mChannelName = getArguments().getString(CHANNEL_NAME);
+            mScheduleLink = getArguments().getString(SCHEDULE_LINK);
         }
+
+        Request request = new Request.Builder().url(mScheduleLink).build();
+        client.newCall(request).enqueue(this);
     }
 
     @Override
@@ -85,7 +103,30 @@ public class ExampleFragment1 extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         message = (TextView) view.findViewById(R.id.message);
-        message.setText("Hello, I am fragment " + mParam1);
+        scheduleList = (RecyclerView) view.findViewById(R.id.scheduleView);
 
+        scheduleList.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+    }
+
+    @Override
+    public void onFailure(Request request, IOException e) {
+
+    }
+
+    @Override
+    public void onResponse(Response response) throws IOException {
+        if (response.isSuccessful()) {
+            final String body = response.body().string();
+            mSchedule = gson.fromJson(body, BBCSchedule.class);
+            message.post(new Runnable() {
+                @Override
+                public void run() {
+                        message.setText(body);
+                    scheduleList.setAdapter(new ScheduleAdapter(mSchedule.getSchedule().getDay().getBroadcasts()));
+                }
+            });
+
+        }
     }
 }
