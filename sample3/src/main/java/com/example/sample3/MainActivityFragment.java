@@ -16,11 +16,15 @@
 
 package com.example.sample3;
 
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
 
 import com.imbryk.viewPager.LoopViewPager;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -30,10 +34,15 @@ import util.android.viewpagerindicator.FontableTabPageIndicator;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment implements ViewPager.OnPageChangeListener, View.OnTouchListener {
 
     LoopViewPager mPager;
     CirclePageIndicator mIndicator;
+
+    private static final Handler handler = new Handler();
+
+    private static final int CIRCLE_INDICATOR_SHOW_TIME = 1000;
+
 
     public MainActivityFragment() {
     }
@@ -52,5 +61,55 @@ public class MainActivityFragment extends Fragment {
         mPager.setAdapter(new ExampleFragmentPagerAdapter(this.getFragmentManager()));
         mIndicator.setViewPager(mPager);
         mPager.setBoundaryCaching(true);
+        mIndicator.setOnPageChangeListener(this);
+        mPager.setOnTouchListener(this);
+        handler.postDelayed(hideRunnable, 2*CIRCLE_INDICATOR_SHOW_TIME);
     }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        handler.removeCallbacks(hideRunnable);
+        handler.post(showRunnable);
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        handler.postDelayed(hideRunnable, CIRCLE_INDICATOR_SHOW_TIME);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        handler.removeCallbacks(hideRunnable);
+        handler.post(showRunnable);
+        return false;
+    }
+
+    Runnable hideRunnable = new Runnable() {
+        @Override
+        public void run() {
+            ((View) mIndicator).setAnimation(AnimationUtils
+                    .loadAnimation(getContext(),
+                            android.R.anim.fade_out));
+            ((View) mIndicator).setVisibility(View.GONE);
+        }
+    };
+
+    Runnable showRunnable = new Runnable() {
+        @Override
+        public void run() {
+            handler.removeCallbacks(hideRunnable);
+            if (((View) mIndicator).getVisibility() == View.GONE) {
+                ((View) mIndicator).setAnimation(AnimationUtils
+                        .loadAnimation(getContext(),
+                                android.R.anim.fade_in));
+                ((View) mIndicator).setVisibility(View.VISIBLE);
+            }
+            handler.postDelayed(hideRunnable, CIRCLE_INDICATOR_SHOW_TIME);
+        }
+    };
 }

@@ -22,13 +22,18 @@
                 tools:context=".MainActivityFragment"
                 tools:showIn="@layout/activity_main">
 
-    <util.android.viewpagerindicator.LoopPagerCirclePageIndicator
+
+    <com.viewpagerindicator.CirclePageIndicator
         android:id="@+id/indicator"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:layout_gravity="center"
+        android:paddingTop="3dp"
         app:paddingEnd="4dp"
         app:paddingStart="4dp"
+        app:fillColor="#e307ea"
+        app:strokeColor="#cf33e1"
+        app:radius="4dp"
         android:layout_alignParentBottom="true"
         android:layout_marginBottom="10dp"/>
     <com.imbryk.viewPager.LoopViewPager

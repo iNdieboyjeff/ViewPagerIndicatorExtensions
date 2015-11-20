@@ -5,11 +5,19 @@ Also now includes a complete clone of the original ViewPagerIndicator, modified 
 
 [ ![Download](https://api.bintray.com/packages/indieboyjeff/maven/viewpagerindicator/images/download.svg) ](https://bintray.com/indieboyjeff/maven/viewpagerindicator/_latestVersion)
 
-Useage
+Usage
 ===================================
 
 1. Add Bintray repository to your build script.
 
+        repositories {
+            maven {
+                url  "http://jcenter.bintray.com" 
+            }
+        }
+        
+        or
+        
         repositories {
           maven {
             url  "http://dl.bintray.com/indieboyjeff/maven" 
@@ -33,6 +41,9 @@ Licence
 ===================================
         
         Copyright (c) 2015 Jeff Sutton
+        Copyright (c) 2013 Leszek Mzyk (LoopViewPager)
+        Copyright (c) 2011 Patrik Akerfeldt (ViewPagerIndicator)
+        Copyright (c) 2011 Jake Wharton (ViewPagerIndicator)
         
         Licensed under the Apache License, Version 2.0 (the "License");
         you may not use this file except in compliance with the License.

@@ -36,7 +36,7 @@ public class ExampleFragmentPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return 4;
     }
 
     @Override
@@ -46,10 +46,11 @@ public class ExampleFragmentPagerAdapter extends FragmentStatePagerAdapter {
 
     public ExampleFragmentPagerAdapter(FragmentManager fm) {
         super(fm);
-        mItems.add(ExampleFragment1.newInstance(String.valueOf(2), ""));
-        mItems.add(ExampleFragment1.newInstance(String.valueOf(0), ""));
-        mItems.add(ExampleFragment1.newInstance(String.valueOf(1), ""));
-        mItems.add(ExampleFragment1.newInstance(String.valueOf(2), ""));
-        mItems.add(ExampleFragment1.newInstance(String.valueOf(0), ""));
+        mItems.add(ExampleFragment1.newInstance("BBC Four", "http://www.bbc.co.uk/bbcfour/programmes/schedules.json"));
+        mItems.add(ExampleFragment1.newInstance("BBC One", "http://www.bbc.co.uk/bbcone/programmes/schedules/london.json"));
+        mItems.add(ExampleFragment1.newInstance("BBC Two", "http://www.bbc.co.uk/bbctwo/programmes/schedules/england.json"));
+        mItems.add(ExampleFragment1.newInstance("BBC Three", "http://www.bbc.co.uk/bbcthree/programmes/schedules.json"));
+        mItems.add(ExampleFragment1.newInstance("BBC Four", "http://www.bbc.co.uk/bbcfour/programmes/schedules.json"));
+        mItems.add(ExampleFragment1.newInstance("BBC One", "http://www.bbc.co.uk/bbcone/programmes/schedules/london.json"));
     }
 }
