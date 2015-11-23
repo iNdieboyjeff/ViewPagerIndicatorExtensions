@@ -19,7 +19,9 @@ package com.example.sample3;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.example.sample3.model.Broadcast;
 
 import util.android.textviews.ExpandableTextView;
@@ -33,6 +35,7 @@ public class BroadcastHolder extends RecyclerView.ViewHolder{
     private RecyclerView.Adapter mAdapter;
     private FontTextView mTitle;
     private ExpandableTextView mSynopsis;
+    private ImageView mThumb;
 
 
     public BroadcastHolder(View itemView, RecyclerView.Adapter adapter) {
@@ -40,11 +43,12 @@ public class BroadcastHolder extends RecyclerView.ViewHolder{
         mAdapter = adapter;
         mTitle = (FontTextView) itemView.findViewById(R.id.title);
         mSynopsis = (ExpandableTextView) itemView.findViewById(R.id.synopsis);
+        mThumb = (ImageView) itemView.findViewById(R.id.imageView);
     }
 
     public void bindBroadcast(final Broadcast broadcast, int position) {
         mTitle.setText(broadcast.getProgramme().getDisplayTitles().getTitle());
-        mSynopsis.setText(broadcast.getProgramme().getShortSynopsis() + "\nhfdsfuihewkjfksdhfkhsdfhisuehf\nhfourhfgiurehgiheighrehgiuh\ngoiherogthreuhgiurehh\noifgdfgfdgaegregfgdfgfdgrrgghir", true);
+        mSynopsis.setText(broadcast.getProgramme().getShortSynopsis(), true);
         mSynopsis.setOnViewClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,6 +58,6 @@ public class BroadcastHolder extends RecyclerView.ViewHolder{
         mSynopsis.requestLayout();
         mSynopsis.setContracted(!broadcast.expanded);
         Log.d("HOLDER", "Position: " + position + ", Expanded: " + broadcast.expanded);
-
+        Glide.with(mThumb.getContext()).load("http://ichef.bbci.co.uk/images/ic/480x270/" + broadcast.getProgramme().getImage().getPid() + ".jpg").fitCenter().into(mThumb);
     }
 }

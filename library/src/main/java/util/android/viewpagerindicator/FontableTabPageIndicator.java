@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import util.android.textviews.FontTextView;
+import util.android.textviews.TypefaceCache;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
@@ -47,7 +48,6 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 public class FontableTabPageIndicator extends HorizontalScrollView implements PageIndicator {
 
     private static final String LOGTAG = FontableTabPageIndicator.class.getSimpleName();
-    private static final LruCache<String, Typeface> sTypefaceCache = new LruCache<>(12);
 
     private Typeface normalText;
     private Typeface selectedText;
@@ -123,52 +123,7 @@ public class FontableTabPageIndicator extends HorizontalScrollView implements Pa
     }
 
     private Typeface setATypeface(String font) {
-        Typeface tf = sTypefaceCache.get(font);
-        if(tf == null) {
-            Log.d(LOGTAG, "loading in font: " + font);
-            tf = Typeface.createFromAsset(getContext().getAssets(), getAssetPath(font));
-            sTypefaceCache.put(font, tf);
-        }
-        return tf;
-    }
-
-
-    /**
-     * <p>Look to see if an font exists in the assets folder.</p>
-     *
-     * <p>If a file cannot be found, this method will also check if a file with .tff or .otf
-     * appended to the name exists.  This allows you to specify just the font name in your code,
-     * rather than the full filename.</p>
-     *
-     * @param fontName The name of the font file you want to locate
-     * @return String representing the actual name of the font file
-     */
-    private String getAssetPath(String fontName) {
-        AssetManager assetManager = getResources().getAssets();
-        InputStream inputStream = null;
-        try {
-            inputStream = assetManager.open(fontName);
-        } catch (IOException ex) {
-            try {
-                inputStream = assetManager.open(fontName + ".ttf");
-                fontName += ".ttf";
-            } catch (IOException e) {
-                try {
-                    inputStream = assetManager.open(fontName + ".otf");
-                    fontName += ".otf";
-                } catch (IOException e2) {
-                    e2.printStackTrace();
-                }
-            }
-        } finally {
-            try {
-                assert inputStream != null;
-                inputStream.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return fontName;
+        return TypefaceCache.loadTypeface(getContext(), font);
     }
 
     public void setOnTabReselectedListener(OnTabReselectedListener listener) {
