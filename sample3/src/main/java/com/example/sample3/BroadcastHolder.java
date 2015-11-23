@@ -17,6 +17,7 @@
 package com.example.sample3;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
 
 import com.example.sample3.model.Broadcast;
@@ -44,13 +45,15 @@ public class BroadcastHolder extends RecyclerView.ViewHolder{
     public void bindBroadcast(final Broadcast broadcast, int position) {
         mTitle.setText(broadcast.getProgramme().getDisplayTitles().getTitle());
         mSynopsis.setText(broadcast.getProgramme().getShortSynopsis() + "\nhfdsfuihewkjfksdhfkhsdfhisuehf\nhfourhfgiurehgiheighrehgiuh\ngoiherogthreuhgiurehh\noifgdfgfdgaegregfgdfgfdgrrgghir", true);
-        mSynopsis.setContracted(!broadcast.expanded);
         mSynopsis.setOnViewClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 broadcast.expanded = !mSynopsis.getContracted();
             }
         });
+        mSynopsis.requestLayout();
+        mSynopsis.setContracted(!broadcast.expanded);
+        Log.d("HOLDER", "Position: " + position + ", Expanded: " + broadcast.expanded);
 
     }
 }
