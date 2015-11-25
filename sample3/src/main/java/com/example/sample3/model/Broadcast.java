@@ -8,11 +8,31 @@ import android.os.Parcelable.Creator;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
+
+import util.android.util.DateUtils;
+
 @Generated("org.jsonschema2pojo")
 public class Broadcast implements Parcelable
 {
 
     public boolean expanded = false;
+    public Date startDate;
+    public Date endDate;
+
+    public Date getStartDate() {
+        if (startDate == null) {
+            startDate = DateUtils.parseAtomDate(start, DateUtils.TZ_LONDON);
+        }
+        return startDate;
+    }
+
+    public Date getEndDate() {
+        if (endDate == null) {
+            endDate = DateUtils.parseAtomDate(start, DateUtils.TZ_LONDON);
+        }
+        return endDate;
+    }
 
     @SerializedName("is_repeat")
     @Expose

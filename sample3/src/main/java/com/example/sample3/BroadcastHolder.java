@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.example.sample3.model.Broadcast;
 
+import util.android.support.v7.textviews.AppCompatFontTextView;
 import util.android.textviews.ExpandableTextView;
 import util.android.textviews.FontTextView;
 
@@ -33,7 +34,7 @@ import util.android.textviews.FontTextView;
 public class BroadcastHolder extends RecyclerView.ViewHolder{
 
     private RecyclerView.Adapter mAdapter;
-    private FontTextView mTitle;
+    private AppCompatFontTextView mTitle;
     private ExpandableTextView mSynopsis;
     private ImageView mThumb;
 
@@ -41,7 +42,7 @@ public class BroadcastHolder extends RecyclerView.ViewHolder{
     public BroadcastHolder(View itemView, RecyclerView.Adapter adapter) {
         super(itemView);
         mAdapter = adapter;
-        mTitle = (FontTextView) itemView.findViewById(R.id.title);
+        mTitle = (AppCompatFontTextView) itemView.findViewById(R.id.title);
         mSynopsis = (ExpandableTextView) itemView.findViewById(R.id.synopsis);
         mThumb = (ImageView) itemView.findViewById(R.id.imageView);
     }

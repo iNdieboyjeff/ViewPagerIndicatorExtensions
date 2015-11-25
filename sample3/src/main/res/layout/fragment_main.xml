@@ -14,7 +14,7 @@
   ~  limitations under the License.
   -->
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:tools="http://schemas.android.com/tools"
                 xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:layout_width="match_parent"
@@ -27,20 +27,21 @@
         android:id="@+id/indicator"
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
-        android:layout_gravity="center"
+        android:layout_gravity="bottom|center_horizontal"
         android:paddingTop="3dp"
         app:paddingEnd="4dp"
         app:paddingStart="4dp"
         app:fillColor="#e307ea"
         app:strokeColor="#cf33e1"
         app:radius="4dp"
-        android:layout_alignParentBottom="true"
+        android:elevation="30dp"
+        android:fitsSystemWindows="true"
         android:layout_marginBottom="10dp"/>
     <com.imbryk.viewPager.LoopViewPager
         android:id="@+id/pager"
+        android:fitsSystemWindows="true"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="1"
         />
 
-</RelativeLayout>
+</FrameLayout>

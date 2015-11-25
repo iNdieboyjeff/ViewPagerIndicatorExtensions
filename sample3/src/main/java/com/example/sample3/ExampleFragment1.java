@@ -54,7 +54,6 @@ public class ExampleFragment1 extends Fragment implements Callback {
 
     private BBCSchedule mSchedule;
 
-    private TextView message;
     private RecyclerView scheduleList;
 
     public ExampleFragment1() {
@@ -102,9 +101,7 @@ public class ExampleFragment1 extends Fragment implements Callback {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        message = (TextView) view.findViewById(R.id.message);
         scheduleList = (RecyclerView) view.findViewById(R.id.scheduleView);
-
         scheduleList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
     }
@@ -119,14 +116,20 @@ public class ExampleFragment1 extends Fragment implements Callback {
         if (response.isSuccessful()) {
             final String body = response.body().string();
             mSchedule = gson.fromJson(body, BBCSchedule.class);
-            message.post(new Runnable() {
+            scheduleList.post(new Runnable() {
                 @Override
                 public void run() {
-                        message.setText(body);
                     scheduleList.setAdapter(new ScheduleAdapter(mSchedule.getSchedule().getDay().getBroadcasts()));
                 }
             });
 
         }
+    }
+
+    public String getChannelName() {
+        if (mChannelName == null) {
+            mChannelName = getArguments().getString(CHANNEL_NAME);
+        }
+        return mChannelName;
     }
 }

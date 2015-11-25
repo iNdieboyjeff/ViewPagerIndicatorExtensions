@@ -19,6 +19,9 @@ package com.example.sample3;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.Log;
+
+import com.imbryk.viewPager.LoopViewPager;
 
 import java.util.ArrayList;
 
@@ -41,7 +44,13 @@ public class ExampleFragmentPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return "Page " + position;
+        Log.d("PAGER", "Looking for position " + position);
+        position = position + 1;
+        if (position > getCount()) {
+            position = 1;
+        }
+        Log.d("PAGER", "Returning position " + position);
+        return mItems.get(position).getChannelName();
     }
 
     public ExampleFragmentPagerAdapter(FragmentManager fm) {

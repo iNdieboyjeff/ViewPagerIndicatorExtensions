@@ -17,14 +17,18 @@
 package com.example.sample3;
 
 import android.os.Handler;
+import android.support.annotation.Nullable;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
+import android.widget.Toast;
 
 import com.imbryk.viewPager.LoopViewPager;
 import com.viewpagerindicator.CirclePageIndicator;
@@ -46,6 +50,14 @@ public class MainActivityFragment extends Fragment implements ViewPager.OnPageCh
     }
 
     @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        CoordinatorLayout.LayoutParams lp = (CoordinatorLayout.LayoutParams) getView().getLayoutParams();
+        MyBehavior behavior = (MyBehavior) lp.getBehavior();
+        behavior.setLayout(mIndicator);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_main, container, false);
@@ -62,6 +74,13 @@ public class MainActivityFragment extends Fragment implements ViewPager.OnPageCh
         mIndicator.setOnPageChangeListener(this);
         mPager.setOnTouchListener(this);
         handler.postDelayed(hideRunnable, 2 * CIRCLE_INDICATOR_SHOW_TIME);
+        mIndicator.setCurrentItem(0);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
     }
 
     @Override
@@ -71,8 +90,10 @@ public class MainActivityFragment extends Fragment implements ViewPager.OnPageCh
     }
 
     @Override
-    public void onPageSelected(int position) {
+    public void onPageSelected(final int position) {
         handler.postDelayed(hideRunnable, CIRCLE_INDICATOR_SHOW_TIME);
+        ((MainActivity)getActivity()).setActionBarTitle(mPager.getAdapter().getPageTitle(position).toString());
+
     }
 
     @Override
