@@ -14,41 +14,38 @@
  *  limitations under the License.
  */
 
-package com.example.sample3;
+package com.example.sample3.list;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.example.sample3.R;
 import com.example.sample3.model.Broadcast;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import util.android.support.v7.textviews.AppCompatFontTextView;
 import util.android.textviews.ExpandableTextView;
-import util.android.textviews.FontTextView;
 
 /**
  * Created by jeff on 20/11/2015.
  */
 public class BroadcastHolder extends RecyclerView.ViewHolder{
 
-    private RecyclerView.Adapter mAdapter;
-    private AppCompatFontTextView mTitle;
-    private ExpandableTextView mSynopsis;
-    private ImageView mThumb;
+    @Bind(R.id.title) AppCompatFontTextView mTitle;
+    @Bind(R.id.synopsis) ExpandableTextView mSynopsis;
+    @Bind (R.id.imageView)  ImageView mThumb;
 
 
     public BroadcastHolder(View itemView, RecyclerView.Adapter adapter) {
         super(itemView);
-        mAdapter = adapter;
-        mTitle = (AppCompatFontTextView) itemView.findViewById(R.id.title);
-        mSynopsis = (ExpandableTextView) itemView.findViewById(R.id.synopsis);
-        mThumb = (ImageView) itemView.findViewById(R.id.imageView);
+        ButterKnife.bind(this, itemView);
     }
 
     public void bindBroadcast(final Broadcast broadcast, int position) {
-        mTitle.setText(broadcast.getProgramme().getDisplayTitles().getTitle());
+        mTitle.setText(Broadcast.TIME_FORMAT.format(broadcast.getStartDate()) + " " + broadcast.getProgramme().getDisplayTitles().getTitle());
         mSynopsis.setText(broadcast.getProgramme().getShortSynopsis(), true);
         mSynopsis.setOnViewClickListener(new View.OnClickListener() {
             @Override
@@ -58,7 +55,6 @@ public class BroadcastHolder extends RecyclerView.ViewHolder{
         });
         mSynopsis.requestLayout();
         mSynopsis.setContracted(!broadcast.expanded);
-        Log.d("HOLDER", "Position: " + position + ", Expanded: " + broadcast.expanded);
         Glide.with(mThumb.getContext()).load("http://ichef.bbci.co.uk/images/ic/480x270/" + broadcast.getProgramme().getImage().getPid() + ".jpg").fitCenter().into(mThumb);
     }
 }

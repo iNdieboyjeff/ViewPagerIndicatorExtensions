@@ -47,6 +47,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:minHeight="100dp"
+                android:id="@+id/header"
                 android:scaleType="centerCrop"
                 android:src="@drawable/header_01"
                 app:layout_collapseMode="parallax"
@@ -67,10 +68,10 @@
 
     <fragment
         android:id="@+id/fragment"
-        android:name="com.example.sample3.MainActivityFragment"
+        android:name="com.example.sample3.fragment.MainActivityFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="com.example.sample3.MyBehavior"
+        app:layout_behavior="com.example.sample3.fragment.MyBehavior"
         tools:layout="@layout/fragment_main"/>
 
 </android.support.design.widget.CoordinatorLayout>

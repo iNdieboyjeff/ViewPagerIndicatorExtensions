@@ -8,6 +8,7 @@ import android.os.Parcelable.Creator;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import util.android.util.DateUtils;
@@ -15,6 +16,8 @@ import util.android.util.DateUtils;
 @Generated("org.jsonschema2pojo")
 public class Broadcast implements Parcelable
 {
+
+    public static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm");
 
     public boolean expanded = false;
     public Date startDate;

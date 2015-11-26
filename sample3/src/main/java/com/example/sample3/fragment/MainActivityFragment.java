@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.example.sample3;
+package com.example.sample3.fragment;
 
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -22,31 +22,73 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
-import android.widget.Toast;
 
+import com.example.sample3.MainActivity;
+import com.example.sample3.R;
+import com.example.sample3.adapter.pager.ChannelFragmentPagerAdapter;
 import com.imbryk.viewPager.LoopViewPager;
 import com.viewpagerindicator.CirclePageIndicator;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment implements ViewPager.OnPageChangeListener, View.OnTouchListener {
 
-    private LoopViewPager mPager;
-    private CirclePageIndicator mIndicator;
-
     private static final Handler handler = new Handler();
-
     private static final int CIRCLE_INDICATOR_SHOW_TIME = 1000;
+    @Bind(R.id.pager)
+    LoopViewPager mPager;
+    @Bind(R.id.indicator)
+    CirclePageIndicator mIndicator;
+    private final Runnable hideRunnable = new Runnable() {
+        @Override
+        public void run() {
+            mIndicator.setAnimation(AnimationUtils
+                    .loadAnimation(getContext(),
+                            android.R.anim.fade_out));
+            mIndicator.setVisibility(View.GONE);
+        }
+    };
+    private final Runnable showRunnable = new Runnable() {
+        @Override
+        public void run() {
+            handler.removeCallbacks(hideRunnable);
+            if (mIndicator.getVisibility() == View.GONE) {
+                mIndicator.setAnimation(AnimationUtils
+                        .loadAnimation(getContext(),
+                                android.R.anim.fade_in));
+                mIndicator.setVisibility(View.VISIBLE);
+            }
+            handler.postDelayed(hideRunnable, CIRCLE_INDICATOR_SHOW_TIME);
+        }
+    };
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        ButterKnife.bind(this, view);
+        return view;
+    }
 
-    public MainActivityFragment() {
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mPager.setAdapter(new ChannelFragmentPagerAdapter(this.getFragmentManager()));
+        mIndicator.setViewPager(mPager);
+        mPager.setBoundaryCaching(true);
+        mIndicator.setOnPageChangeListener(this);
+        mPager.setOnTouchListener(this);
+        handler.postDelayed(hideRunnable, 2 * CIRCLE_INDICATOR_SHOW_TIME);
+        mIndicator.setCurrentItem(0);
     }
 
     @Override
@@ -58,29 +100,12 @@ public class MainActivityFragment extends Fragment implements ViewPager.OnPageCh
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_main, container, false);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        mPager = (LoopViewPager) view.findViewById(R.id.pager);
-        mIndicator = (CirclePageIndicator) view.findViewById(R.id.indicator);
-        mPager.setAdapter(new ExampleFragmentPagerAdapter(this.getFragmentManager()));
-        mIndicator.setViewPager(mPager);
-        mPager.setBoundaryCaching(true);
-        mIndicator.setOnPageChangeListener(this);
-        mPager.setOnTouchListener(this);
-        handler.postDelayed(hideRunnable, 2 * CIRCLE_INDICATOR_SHOW_TIME);
-        mIndicator.setCurrentItem(0);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 
+    }
+
+    public MainActivityFragment() {
     }
 
     @Override
@@ -92,8 +117,8 @@ public class MainActivityFragment extends Fragment implements ViewPager.OnPageCh
     @Override
     public void onPageSelected(final int position) {
         handler.postDelayed(hideRunnable, CIRCLE_INDICATOR_SHOW_TIME);
-        ((MainActivity)getActivity()).setActionBarTitle(mPager.getAdapter().getPageTitle(position).toString());
-
+        ((MainActivity) getActivity()).setActionBarTitle(mPager.getAdapter().getPageTitle(position).toString());
+        ((MainActivity) getActivity()).setHeaderImage(((ChannelFragmentPagerAdapter) mPager.getAdapter()).getPageHeaderImage(position));
     }
 
     @Override
@@ -108,27 +133,5 @@ public class MainActivityFragment extends Fragment implements ViewPager.OnPageCh
         return false;
     }
 
-    private final Runnable hideRunnable = new Runnable() {
-        @Override
-        public void run() {
-            mIndicator.setAnimation(AnimationUtils
-                    .loadAnimation(getContext(),
-                            android.R.anim.fade_out));
-            mIndicator.setVisibility(View.GONE);
-        }
-    };
 
-    private final Runnable showRunnable = new Runnable() {
-        @Override
-        public void run() {
-            handler.removeCallbacks(hideRunnable);
-            if (mIndicator.getVisibility() == View.GONE) {
-                mIndicator.setAnimation(AnimationUtils
-                        .loadAnimation(getContext(),
-                                android.R.anim.fade_in));
-                mIndicator.setVisibility(View.VISIBLE);
-            }
-            handler.postDelayed(hideRunnable, CIRCLE_INDICATOR_SHOW_TIME);
-        }
-    };
 }

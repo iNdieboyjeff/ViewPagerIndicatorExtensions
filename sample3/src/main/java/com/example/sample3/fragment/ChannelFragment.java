@@ -14,18 +14,24 @@
  *  limitations under the License.
  */
 
-package com.example.sample3;
+package com.example.sample3.fragment;
 
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
+import com.example.sample3.Application;
+import com.example.sample3.R;
+import com.example.sample3.adapter.list.ScheduleAdapter;
+import com.example.sample3.di.component.NetComponent;
 import com.example.sample3.model.BBCSchedule;
 import com.google.gson.Gson;
 import com.squareup.okhttp.Callback;
@@ -35,28 +41,41 @@ import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ExampleFragment1#newInstance} factory method to
+ * Use the {@link ChannelFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ExampleFragment1 extends Fragment implements Callback {
+public class ChannelFragment extends Fragment implements Callback {
 
-    private static final OkHttpClient client = new OkHttpClient();
-    private static final Gson gson = new Gson();
+private static final String LOG_TAG = ChannelFragment.class.getSimpleName();
+
+    @Inject
+    OkHttpClient okHttpClient;
+
+    @Inject
+    Gson gson;
 
     private static final String CHANNEL_NAME = "channel_name";
     private static final String SCHEDULE_LINK = "schedule_link";
+    private static final String HEADER_IMAGE = "header_image";
 
     private String mChannelName;
     private String mScheduleLink;
+    private int mHeaderResource;
 
     private BBCSchedule mSchedule;
 
-    private RecyclerView scheduleList;
+    @Bind(R.id.scheduleView)
+    RecyclerView scheduleList;
 
-    public ExampleFragment1() {
+    public ChannelFragment() {
         // Required empty public constructor
     }
 
@@ -66,14 +85,15 @@ public class ExampleFragment1 extends Fragment implements Callback {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment ExampleFragment1.
+     * @return A new instance of fragment ChannelFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ExampleFragment1 newInstance(String param1, String param2) {
-        ExampleFragment1 fragment = new ExampleFragment1();
+    public static ChannelFragment newInstance(String param1, String param2, int param3) {
+        ChannelFragment fragment = new ChannelFragment();
         Bundle args = new Bundle();
         args.putString(CHANNEL_NAME, param1);
         args.putString(SCHEDULE_LINK, param2);
+        args.putInt(HEADER_IMAGE, param3);
         fragment.setArguments(args);
         return fragment;
     }
@@ -84,26 +104,44 @@ public class ExampleFragment1 extends Fragment implements Callback {
         if (getArguments() != null) {
             mChannelName = getArguments().getString(CHANNEL_NAME);
             mScheduleLink = getArguments().getString(SCHEDULE_LINK);
+            mHeaderResource = getArguments().getInt(HEADER_IMAGE);
         }
 
-        Request request = new Request.Builder().url(mScheduleLink).build();
-        client.newCall(request).enqueue(this);
+        if (okHttpClient != null) {
+            Request request = new Request.Builder().url(mScheduleLink).build();
+            okHttpClient.newCall(request).enqueue(this);
+        } else {
+            Log.e(LOG_TAG, "okHTTPclient is null");
+        }
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_example_fragment1, container, false);
+        View view = inflater.inflate(R.layout.fragment_example_fragment1, container, false);
+        ButterKnife.bind(this, view);
+        return view;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        NetComponent netComponent = ((Application)getActivity().getApplication()).getNetComponent();
+
+        if (netComponent != null) {
+            netComponent.inject(this);
+        } else {
+            Log.e(LOG_TAG, "netComponent is null");
+        }
+
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        scheduleList = (RecyclerView) view.findViewById(R.id.scheduleView);
         scheduleList.setLayoutManager(new LinearLayoutManager(getActivity()));
-
     }
 
     @Override
@@ -131,5 +169,12 @@ public class ExampleFragment1 extends Fragment implements Callback {
             mChannelName = getArguments().getString(CHANNEL_NAME);
         }
         return mChannelName;
+    }
+
+    public int getHeaderResource() {
+        if (mHeaderResource < 1) {
+            mHeaderResource = getArguments().getInt(HEADER_IMAGE);
+        }
+        return mHeaderResource;
     }
 }

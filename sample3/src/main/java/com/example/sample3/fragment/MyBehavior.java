@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.example.sample3;
+package com.example.sample3.fragment;
 
 import android.content.Context;
 import android.support.design.widget.AppBarLayout;
@@ -22,6 +22,9 @@ import android.support.design.widget.CoordinatorLayout;
 import android.util.AttributeSet;
 import android.view.View;
 
+/**
+ * Created by jeff on 26/11/2015.
+ */
 public class MyBehavior extends AppBarLayout.ScrollingViewBehavior {
 
     private View layout;

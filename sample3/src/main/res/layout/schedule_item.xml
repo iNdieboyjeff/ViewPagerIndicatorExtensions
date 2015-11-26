@@ -21,19 +21,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="2dp">
+    android:padding="1dp">
 
     <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="2.5dp"
         app:cardUseCompatPadding="true"
-        app:cardElevation="6.5dp">
+        app:cardElevation="1dp">
 
         <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="8dp">
+            android:padding="6dp">
 
             <ImageView
                 android:layout_width="100dp"
@@ -48,7 +47,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="Cabin-Bold"
                 android:lines="1"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:layout_toRightOf="@+id/imageView"/>
 
@@ -59,7 +58,7 @@
                 android:layout_below="@+id/title"
                 android:ellipsize="end"
                 android:fontFamily="Cabin-Regular"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 app:expandColor="#f72adb"
                 app:trimLength="2"
                 android:layout_alignLeft="@+id/title"/>

@@ -14,14 +14,14 @@
  *  limitations under the License.
  */
 
-package com.example.sample3;
+package com.example.sample3.adapter.list;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 
+import com.example.sample3.list.BroadcastHolder;
+import com.example.sample3.R;
 import com.example.sample3.model.Broadcast;
 
 import java.util.List;

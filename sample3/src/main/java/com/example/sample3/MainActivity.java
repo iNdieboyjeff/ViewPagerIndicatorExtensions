@@ -19,26 +19,28 @@ package com.example.sample3;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.view.View;
+import android.widget.ImageView;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import util.android.textviews.TypefaceSpan;
 
 public class MainActivity extends AppCompatActivity {
 
-    CollapsingToolbarLayout collapsing;
+    @Bind(R.id.collapsing_toolbar) CollapsingToolbarLayout collapsing;
+    @Bind(R.id.header) ImageView headerImage;
+    @Bind(R.id.toolbar) Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        collapsing = (CollapsingToolbarLayout) findViewById(R.id.collapsing_toolbar);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         setActionBarTitle();
     }
@@ -47,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
         if (getSupportActionBar() == null) return;
         TypefaceSpan span = new TypefaceSpan(this, "Audiowide-Regular");
         ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.CYAN);
-
         SpannableString title = new SpannableString("VPagerIndicator3");
         title.setSpan(span, 0, title.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         title.setSpan(colorSpan, 9, title.length()-1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -58,5 +59,9 @@ public class MainActivity extends AppCompatActivity {
     public void setActionBarTitle(String title) {
         getSupportActionBar().setTitle(title);
         collapsing.setTitle(title);
+    }
+
+    public void setHeaderImage(int resourceId) {
+        headerImage.setImageResource(resourceId);
     }
 }
