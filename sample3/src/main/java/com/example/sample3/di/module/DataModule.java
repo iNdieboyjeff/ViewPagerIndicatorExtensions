@@ -27,6 +27,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import util.android.okhttp.OKHttpLoggingInterceptor;
 
 /**
  * Created by jeff on 26/11/2015.
@@ -47,6 +48,7 @@ public class DataModule {
     OkHttpClient provideOkHttpClient(Cache cache) {
         OkHttpClient okHttpClient = new OkHttpClient();
         okHttpClient.setCache(cache);
+        okHttpClient.interceptors().add(new OKHttpLoggingInterceptor());
         return okHttpClient;
     }
 
