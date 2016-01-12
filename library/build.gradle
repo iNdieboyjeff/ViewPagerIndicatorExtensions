@@ -20,7 +20,7 @@ apply plugin: 'com.jfrog.bintray'
 
 allprojects {
     group = 'util.android.viewpagerindicator'
-    version = '1.1.8'
+    version = '1.1.11'
 }
 
 repositories {
@@ -87,7 +87,7 @@ bintray {
         licenses = ["Apache-2.0"]
         publish = true
         version {
-            name = '1.1.8'
+            name = '1.1.11'
             desc = 'ViewPagerIndicator Extensions'
         }
     }

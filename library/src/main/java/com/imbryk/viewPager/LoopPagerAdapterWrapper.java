@@ -16,18 +16,19 @@
 
 package com.imbryk.viewPager;
 
+import android.database.DataSetObserver;
 import android.os.Parcelable;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 
 /**
- * A PagerAdapter wrapper responsible for providing a proper page to
- * LoopViewPager
- *
+ * A PagerAdapter wrapper responsible for providing a proper page to LoopViewPager
+ * <p>
  * This class shouldn't be used directly
  */
 public class LoopPagerAdapterWrapper extends PagerAdapter {
@@ -38,60 +39,38 @@ public class LoopPagerAdapterWrapper extends PagerAdapter {
 
     private boolean mBoundaryCaching;
 
-    void setBoundaryCaching(boolean flag) {
-        mBoundaryCaching = flag;
-    }
-
     LoopPagerAdapterWrapper(PagerAdapter adapter) {
         this.mAdapter = adapter;
+        adapter.registerDataSetObserver(new DataSetObserver() {
+            public void onChanged() {
+                notifyDataSetChanged();
+            }
+        });
     }
 
-    @Override
-    public void notifyDataSetChanged() {
-        mToDestroy = new SparseArray<>();
-        super.notifyDataSetChanged();
-    }
-
-    int toRealPosition(int position) {
-        int realCount = getRealCount();
-
-        int realPosition = (position-1) % realCount;
-        if (realPosition < 0)
-            realPosition += realCount;
-
-        return realPosition;
+    void setBoundaryCaching(boolean flag) {
+        mBoundaryCaching = flag;
     }
 
     public int toInnerPosition(int realPosition) {
         return (realPosition + 1);
     }
 
-    private int getRealFirstPosition() {
-        return 1;
-    }
-
-    private int getRealLastPosition() {
-        return getRealFirstPosition() + getRealCount() - 1;
+    @Override
+    public int getCount() {
+        return mAdapter.getCount() > 0 ? mAdapter.getCount() + 2 : 0;
     }
 
     @Override
-    public int getCount() {
-        return mAdapter.getCount() + 2;
-    }
-
-    public int getRealCount() {
-        return mAdapter.getCount();
-    }
-
-    public PagerAdapter getRealAdapter() {
-        return mAdapter;
+    public void startUpdate(ViewGroup container) {
+        mAdapter.startUpdate(container);
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         int realPosition = (mAdapter instanceof FragmentPagerAdapter || mAdapter instanceof FragmentStatePagerAdapter)
-                ? position
-                : toRealPosition(position);
+                               ? position
+                               : toRealPosition(position);
 
         if (mBoundaryCaching) {
             ToDestroy toDestroy = mToDestroy.get(position);
@@ -103,20 +82,49 @@ public class LoopPagerAdapterWrapper extends PagerAdapter {
         return mAdapter.instantiateItem(container, realPosition);
     }
 
+    int toRealPosition(int position) {
+        int realCount = getRealCount();
+
+        if (realCount == 0) return 0;
+
+        int realPosition = (position - 1) % realCount;
+        if (realPosition < 0)
+            realPosition += realCount;
+
+        return realPosition;
+    }
+
+    public int getRealCount() {
+        return mAdapter.getCount();
+    }
+
     @Override
     public void destroyItem(ViewGroup container, int position, Object object) {
         int realFirst = getRealFirstPosition();
         int realLast = getRealLastPosition();
         int realPosition = (mAdapter instanceof FragmentPagerAdapter || mAdapter instanceof FragmentStatePagerAdapter)
-                ? position
-                : toRealPosition(position);
+                               ? position
+                               : toRealPosition(position);
 
         if (mBoundaryCaching && (position == realFirst || position == realLast)) {
             mToDestroy.put(position, new ToDestroy(container, realPosition,
-                    object));
+                                                      object));
         } else {
             mAdapter.destroyItem(container, realPosition, object);
         }
+    }
+
+    private int getRealFirstPosition() {
+        return 1;
+    }
+
+    private int getRealLastPosition() {
+        return getRealFirstPosition() + getRealCount() - 1;
+    }
+
+    @Override
+    public void finishUpdate(ViewGroup container) {
+        mAdapter.finishUpdate(container);
     }
 
     /*
@@ -124,18 +132,8 @@ public class LoopPagerAdapterWrapper extends PagerAdapter {
      */
 
     @Override
-    public void finishUpdate(ViewGroup container) {
-        mAdapter.finishUpdate(container);
-    }
-
-    @Override
     public boolean isViewFromObject(View view, Object object) {
         return mAdapter.isViewFromObject(view, object);
-    }
-
-    @Override
-    public void restoreState(Parcelable bundle, ClassLoader classLoader) {
-        mAdapter.restoreState(bundle, classLoader);
     }
 
     @Override
@@ -144,8 +142,19 @@ public class LoopPagerAdapterWrapper extends PagerAdapter {
     }
 
     @Override
-    public void startUpdate(ViewGroup container) {
-        mAdapter.startUpdate(container);
+    public void restoreState(Parcelable bundle, ClassLoader classLoader) {
+        mAdapter.restoreState(bundle, classLoader);
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        Log.d("LOOPPAGER", "notifyDataSetChanged()");
+        mToDestroy = new SparseArray<>();
+        super.notifyDataSetChanged();
+    }
+
+    public PagerAdapter getRealAdapter() {
+        return mAdapter;
     }
 
     /*
