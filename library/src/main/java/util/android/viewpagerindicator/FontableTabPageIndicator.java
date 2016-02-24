@@ -113,16 +113,24 @@ public class FontableTabPageIndicator extends HorizontalScrollView implements Pa
         for (int i = 0; i < n; ++i) {
             int attr = a.getIndex(i);
             if (attr == R.styleable.FontableTabPageIndicator_fontFamilyNormal) {
-                normalText = setATypeface(a.getString(attr));
+                try {
+                    normalText = setATypeface(a.getString(attr));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             } else if (attr == R.styleable.FontableTabPageIndicator_fontFamilySelected) {
-                selectedText = setATypeface(a.getString(attr));
+                try {
+                    selectedText = setATypeface(a.getString(attr));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
         }
         a.recycle();
     }
 
-    private Typeface setATypeface(String font) {
+    private Typeface setATypeface(String font) throws IOException {
         return TypefaceCache.loadTypeface(getContext(), font);
     }
 

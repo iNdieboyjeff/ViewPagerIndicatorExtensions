@@ -148,7 +148,6 @@ public class LoopPagerAdapterWrapper extends PagerAdapter {
 
     @Override
     public void notifyDataSetChanged() {
-        Log.d("LOOPPAGER", "notifyDataSetChanged()");
         mToDestroy = new SparseArray<>();
         super.notifyDataSetChanged();
     }
