@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015 Jeff Sutton
+ *  Copyright (c) 2015-2016 Jeff Sutton
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package com.example.sample3.fragment;
+package com.example.sample3.behaviour;
 
 import android.content.Context;
 import android.support.design.widget.AppBarLayout;
@@ -25,14 +25,14 @@ import android.view.View;
 /**
  * Created by jeff on 26/11/2015.
  */
-public class MyBehavior extends AppBarLayout.ScrollingViewBehavior {
+public class RecyclerPositionBehavior extends AppBarLayout.ScrollingViewBehavior {
 
     private View layout;
 
-    public MyBehavior() {
+    public RecyclerPositionBehavior() {
     }
 
-    public MyBehavior(Context context, AttributeSet attrs) {
+    public RecyclerPositionBehavior(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 

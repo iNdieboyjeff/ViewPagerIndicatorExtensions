@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015 Jeff Sutton
+ *  Copyright (c) 2015-2016 Jeff Sutton
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import com.bumptech.glide.Glide;
 import com.example.sample3.R;
 import com.example.sample3.model.Broadcast;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import util.android.support.v7.textviews.AppCompatFontTextView;
 import util.android.textviews.ExpandableTextView;
@@ -32,11 +32,14 @@ import util.android.textviews.ExpandableTextView;
 /**
  * Created by jeff on 20/11/2015.
  */
-public class BroadcastHolder extends RecyclerView.ViewHolder{
+public class BroadcastHolder extends RecyclerView.ViewHolder {
 
-    @Bind(R.id.title) AppCompatFontTextView mTitle;
-    @Bind(R.id.synopsis) ExpandableTextView mSynopsis;
-    @Bind (R.id.imageView)  ImageView mThumb;
+    @BindView(R.id.title)
+    AppCompatFontTextView mTitle;
+    @BindView(R.id.synopsis)
+    ExpandableTextView mSynopsis;
+    @BindView(R.id.imageView)
+    ImageView mThumb;
 
 
     public BroadcastHolder(View itemView, RecyclerView.Adapter adapter) {
@@ -44,7 +47,7 @@ public class BroadcastHolder extends RecyclerView.ViewHolder{
         ButterKnife.bind(this, itemView);
     }
 
-    public void bindBroadcast(final Broadcast broadcast, int position) {
+    public void bindBroadcast(final Broadcast broadcast) {
         mTitle.setText(Broadcast.TIME_FORMAT.format(broadcast.getStartDate()) + " " + broadcast.getProgramme().getDisplayTitles().getTitle());
         mSynopsis.setText(broadcast.getProgramme().getShortSynopsis(), true);
         mSynopsis.setOnViewClickListener(new View.OnClickListener() {
@@ -55,6 +58,6 @@ public class BroadcastHolder extends RecyclerView.ViewHolder{
         });
         mSynopsis.requestLayout();
         mSynopsis.setContracted(!broadcast.expanded);
-        Glide.with(mThumb.getContext()).load("http://ichef.bbci.co.uk/images/ic/480x270/" + broadcast.getProgramme().getImage().getPid() + ".jpg").fitCenter().into(mThumb);
+        Glide.with(mThumb.getContext()).load(broadcast.getProgramme().getImage().getImageURL()).fitCenter().into(mThumb);
     }
 }

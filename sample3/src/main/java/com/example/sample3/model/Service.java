@@ -1,29 +1,32 @@
+/*
+ *  Copyright (c) 2015-2016 Jeff Sutton
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 package com.example.sample3.model;
 
-import javax.annotation.Generated;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.os.Parcelable.Creator;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-@Generated("org.jsonschema2pojo")
-public class Service implements Parcelable
-{
+import javax.annotation.Generated;
 
-    @SerializedName("type")
-    @Expose
-    private String type;
-    @SerializedName("key")
-    @Expose
-    private String key;
-    @SerializedName("title")
-    @Expose
-    private String title;
-    @SerializedName("outlet")
-    @Expose
-    private Outlet outlet;
+@Generated("org.jsonschema2pojo")
+public class Service implements Parcelable {
+
     public final static Parcelable.Creator<Service> CREATOR = new Creator<Service>() {
 
 
@@ -40,79 +43,78 @@ public class Service implements Parcelable
             return (new Service[size]);
         }
 
-    }
-    ;
+    };
+    @SerializedName("type")
+    @Expose
+    private String type;
+    @SerializedName("key")
+    @Expose
+    private String key;
+    @SerializedName("title")
+    @Expose
+    private String title;
+    @SerializedName("outlet")
+    @Expose
+    private Outlet outlet;
 
     /**
-     * 
-     * @return
-     *     The type
+     * @return The type
      */
     public String getType() {
         return type;
     }
 
     /**
-     * 
-     * @param type
-     *     The type
+     * @param type The type
      */
     public void setType(String type) {
         this.type = type;
     }
 
     /**
-     * 
-     * @return
-     *     The key
+     * @return The key
      */
     public String getKey() {
         return key;
     }
 
     /**
-     * 
-     * @param key
-     *     The key
+     * @param key The key
      */
     public void setKey(String key) {
         this.key = key;
     }
 
     /**
-     * 
-     * @return
-     *     The title
+     * @return The title
      */
     public String getTitle() {
         return title;
     }
 
     /**
-     * 
-     * @param title
-     *     The title
+     * @param title The title
      */
     public void setTitle(String title) {
         this.title = title;
     }
 
     /**
-     * 
-     * @return
-     *     The outlet
+     * @return The outlet
      */
     public Outlet getOutlet() {
         return outlet;
     }
 
     /**
-     * 
-     * @param outlet
-     *     The outlet
+     * @param outlet The outlet
      */
     public void setOutlet(Outlet outlet) {
         this.outlet = outlet;
+    }
+
+    public int describeContents() {
+        return 0;
     }
 
     public void writeToParcel(Parcel dest, int flags) {
@@ -120,10 +122,6 @@ public class Service implements Parcelable
         dest.writeValue(key);
         dest.writeValue(title);
         dest.writeValue(outlet);
-    }
-
-    public int describeContents() {
-        return  0;
     }
 
 }

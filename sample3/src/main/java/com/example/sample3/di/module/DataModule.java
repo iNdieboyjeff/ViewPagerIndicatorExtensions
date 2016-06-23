@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015 Jeff Sutton
+ *  Copyright (c) 2015-2016 Jeff Sutton
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,16 +18,19 @@ package com.example.sample3.di.module;
 
 import android.app.Application;
 
+import com.example.sample3.okhttp3.OKHttpLoggingInterceptor;
+import com.example.sample3.service.BBCScheduleService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.squareup.okhttp.Cache;
-import com.squareup.okhttp.OkHttpClient;
 
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import util.android.okhttp.OKHttpLoggingInterceptor;
+import okhttp3.Cache;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by jeff on 26/11/2015.
@@ -46,17 +49,29 @@ public class DataModule {
     @Provides
     @Singleton
     OkHttpClient provideOkHttpClient(Cache cache) {
-        OkHttpClient okHttpClient = new OkHttpClient();
-        okHttpClient.setCache(cache);
-        okHttpClient.interceptors().add(new OKHttpLoggingInterceptor());
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .cache(cache)
+                .addInterceptor(new OKHttpLoggingInterceptor())
+                .build();
         return okHttpClient;
     }
 
     @Provides
     @Singleton
     Cache provideOkHttpCache(Application application) {
-        int cacheSize = 10 * 1024 * 1024; // 10 MiB
-        Cache cache = new Cache(application.getCacheDir(), cacheSize);
-        return cache;
+        int cacheSize = 12 * 1024 * 1024; // 10 MiB
+        return new Cache(application.getCacheDir(), cacheSize);
+    }
+
+    @Provides
+    @Singleton
+    BBCScheduleService provideBBCScheduleService(OkHttpClient okHttpClient) {
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://www.bbc.co.uk")
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(okHttpClient)
+                .build();
+
+        return retrofit.create(BBCScheduleService.class);
     }
 }

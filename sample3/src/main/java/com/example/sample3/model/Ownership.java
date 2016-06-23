@@ -1,20 +1,32 @@
+/*
+ *  Copyright (c) 2015-2016 Jeff Sutton
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 package com.example.sample3.model;
 
-import javax.annotation.Generated;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.os.Parcelable.Creator;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-@Generated("org.jsonschema2pojo")
-public class Ownership implements Parcelable
-{
+import javax.annotation.Generated;
 
-    @SerializedName("service")
-    @Expose
-    private Service_ service;
+@Generated("org.jsonschema2pojo")
+public class Ownership implements Parcelable {
+
     public final static Parcelable.Creator<Ownership> CREATOR = new Creator<Ownership>() {
 
 
@@ -28,33 +40,31 @@ public class Ownership implements Parcelable
             return (new Ownership[size]);
         }
 
-    }
-    ;
+    };
+    @SerializedName("service")
+    @Expose
+    private Service_ service;
 
     /**
-     * 
-     * @return
-     *     The service
+     * @return The service
      */
     public Service_ getService() {
         return service;
     }
 
     /**
-     * 
-     * @param service
-     *     The service
+     * @param service The service
      */
     public void setService(Service_ service) {
         this.service = service;
     }
 
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(service);
+    public int describeContents() {
+        return 0;
     }
 
-    public int describeContents() {
-        return  0;
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(service);
     }
 
 }

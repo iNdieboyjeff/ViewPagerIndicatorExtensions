@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015 Jeff Sutton
+ *  Copyright (c) 2015-2016 Jeff Sutton
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
-import com.example.sample3.list.BroadcastHolder;
 import com.example.sample3.R;
+import com.example.sample3.list.BroadcastHolder;
 import com.example.sample3.model.Broadcast;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public class ScheduleAdapter extends RecyclerView.Adapter<BroadcastHolder> {
     @Override
     public void onBindViewHolder(BroadcastHolder holder, int position) {
         Broadcast broadcast = mBroadcasts.get(position);
-        holder.bindBroadcast(broadcast, position);
+        holder.bindBroadcast(broadcast);
     }
 
     @Override

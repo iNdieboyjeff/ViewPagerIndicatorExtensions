@@ -1,20 +1,32 @@
+/*
+ *  Copyright (c) 2015-2016 Jeff Sutton
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 package com.example.sample3.model;
 
-import javax.annotation.Generated;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.os.Parcelable.Creator;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-@Generated("org.jsonschema2pojo")
-public class BBCSchedule implements Parcelable
-{
+import javax.annotation.Generated;
 
-    @SerializedName("schedule")
-    @Expose
-    private Schedule schedule;
+@Generated("org.jsonschema2pojo")
+public class BBCSchedule implements Parcelable {
+
     public final static Parcelable.Creator<BBCSchedule> CREATOR = new Creator<BBCSchedule>() {
 
 
@@ -28,33 +40,31 @@ public class BBCSchedule implements Parcelable
             return (new BBCSchedule[size]);
         }
 
-    }
-    ;
+    };
+    @SerializedName("schedule")
+    @Expose
+    private Schedule schedule;
 
     /**
-     * 
-     * @return
-     *     The schedule
+     * @return The schedule
      */
     public Schedule getSchedule() {
         return schedule;
     }
 
     /**
-     * 
-     * @param schedule
-     *     The schedule
+     * @param schedule The schedule
      */
     public void setSchedule(Schedule schedule) {
         this.schedule = schedule;
     }
 
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeValue(schedule);
+    public int describeContents() {
+        return 0;
     }
 
-    public int describeContents() {
-        return  0;
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(schedule);
     }
 
 }

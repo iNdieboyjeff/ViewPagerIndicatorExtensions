@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015 Jeff Sutton
+ *  Copyright (c) 2015-2016 Jeff Sutton
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -18,20 +18,28 @@ package com.example.sample3.adapter.pager;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.util.Log;
+import android.support.v4.app.FragmentPagerAdapter;
 
-import com.example.sample3.fragment.ChannelFragment;
 import com.example.sample3.R;
+import com.example.sample3.fragment.ChannelFragment;
 
 import java.util.ArrayList;
 
 /**
  * Created by jeff on 19/11/2015.
  */
-public class ChannelFragmentPagerAdapter extends FragmentStatePagerAdapter {
+public class ChannelFragmentPagerAdapter extends FragmentPagerAdapter {
 
-    ArrayList<ChannelFragment> mItems = new ArrayList<>();
+    static ArrayList<ChannelFragment> mItems = new ArrayList<>();
+
+    public ChannelFragmentPagerAdapter(FragmentManager fm) {
+        super(fm);
+        if (mItems.size() < 3) {
+            mItems.add(ChannelFragment.newInstance("BBC One", "bbcone", "schedules/london", R.drawable.bbc_one_ident));
+            mItems.add(ChannelFragment.newInstance("BBC Two", "bbctwo", "schedules/england", R.drawable.bbc_two_ident));
+            mItems.add(ChannelFragment.newInstance("BBC News", "bbcnews", "schedules", R.drawable.header_01));
+        }
+    }
 
     @Override
     public Fragment getItem(int position) {
@@ -40,37 +48,19 @@ public class ChannelFragmentPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return 4;
+        if (mItems == null) {
+            return 0;
+        } else {
+            return mItems.size();
+        }
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        Log.d("PAGER", "Looking for position " + position);
-        position = position + 1;
-        if (position > getCount()) {
-            position = 1;
-        }
-        Log.d("PAGER", "Returning position " + position);
         return mItems.get(position).getChannelName();
     }
 
     public int getPageHeaderImage(int position) {
-        Log.d("PAGER", "Looking for position " + position);
-        position = position + 1;
-        if (position > getCount()) {
-            position = 1;
-        }
-        Log.d("PAGER", "Returning position " + position);
         return mItems.get(position).getHeaderResource();
-    }
-
-    public ChannelFragmentPagerAdapter(FragmentManager fm) {
-        super(fm);
-        mItems.add(ChannelFragment.newInstance("BBC Four", "http://www.bbc.co.uk/bbcfour/programmes/schedules.json", R.drawable.header_01));
-        mItems.add(ChannelFragment.newInstance("BBC One", "http://www.bbc.co.uk/bbcone/programmes/schedules/london.json", R.drawable.bbc_one_ident));
-        mItems.add(ChannelFragment.newInstance("BBC Two", "http://www.bbc.co.uk/bbctwo/programmes/schedules/england.json", R.drawable.bbc_two_ident));
-        mItems.add(ChannelFragment.newInstance("BBC Three", "http://www.bbc.co.uk/bbcthree/programmes/schedules.json", R.drawable.header_01));
-        mItems.add(ChannelFragment.newInstance("BBC Four", "http://www.bbc.co.uk/bbcfour/programmes/schedules.json", R.drawable.header_01));
-        mItems.add(ChannelFragment.newInstance("BBC One", "http://www.bbc.co.uk/bbcone/programmes/schedules/london.json", R.drawable.bbc_one_ident));
     }
 }

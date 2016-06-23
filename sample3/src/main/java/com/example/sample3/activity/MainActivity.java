@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015 Jeff Sutton
+ *  Copyright (c) 2015-2016 Jeff Sutton
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -14,27 +14,31 @@
  *  limitations under the License.
  */
 
-package com.example.sample3;
+package com.example.sample3.activity;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
+import android.view.Menu;
 import android.widget.ImageView;
 
-import butterknife.Bind;
+import com.example.sample3.R;
+import com.viewpagerindicator.CirclePageIndicator;
+
+import butterknife.BindView;
 import butterknife.ButterKnife;
-import util.android.textviews.TypefaceSpan;
 
 public class MainActivity extends AppCompatActivity {
 
-    @Bind(R.id.collapsing_toolbar) CollapsingToolbarLayout collapsing;
-    @Bind(R.id.header) ImageView headerImage;
-    @Bind(R.id.toolbar) Toolbar toolbar;
+    @BindView(R.id.collapsing_toolbar)
+    CollapsingToolbarLayout collapsing;
+    @BindView(R.id.header)
+    ImageView headerImage;
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+    @BindView(R.id.indicator)
+    CirclePageIndicator mIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,21 +51,26 @@ public class MainActivity extends AppCompatActivity {
 
     private void setActionBarTitle() {
         if (getSupportActionBar() == null) return;
-        TypefaceSpan span = new TypefaceSpan(this, "Audiowide-Regular");
-        ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.CYAN);
-        SpannableString title = new SpannableString("VPagerIndicator3");
-        title.setSpan(span, 0, title.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        title.setSpan(colorSpan, 9, title.length()-1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        setActionBarTitle("");
+    }
+
+    public void setActionBarTitle(String title) {
+        if (getSupportActionBar() == null) return;
         getSupportActionBar().setTitle(title);
         collapsing.setTitle(title);
     }
 
-    public void setActionBarTitle(String title) {
-        getSupportActionBar().setTitle(title);
-        collapsing.setTitle(title);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     public void setHeaderImage(int resourceId) {
         headerImage.setImageResource(resourceId);
+    }
+
+    public CirclePageIndicator getIndicator() {
+        return mIndicator;
     }
 }

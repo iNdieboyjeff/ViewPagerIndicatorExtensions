@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
   ~  Copyright (c) 2015-2016 Jeff Sutton
   ~
@@ -14,14 +15,6 @@
   ~  limitations under the License.
   -->
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto"
-      xmlns:tools="http://schemas.android.com/tools"
-      tools:context=".activity.MainActivity">
-    <item
-        android:id="@+id/action_play"
-        android:orderInCategory="100"
-        android:title="Watch"
-        android:icon="@drawable/ic_play_arrow_white_36dp"
-        app:showAsAction="always"/>
-</menu>
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="36dp" android:viewportHeight="24.0" android:viewportWidth="24.0" android:width="36dp">
+    <path android:fillColor="#FFFFFF" android:pathData="M8,5v14l11,-7z"/>
+</vector>

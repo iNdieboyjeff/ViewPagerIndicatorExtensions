@@ -14,16 +14,16 @@
  *  limitations under the License.
  */
 
-package com.example.sample3;
+package com.example.sample3.service;
 
-import android.app.Application;
-import android.test.ApplicationTestCase;
+import com.example.sample3.model.BBCSchedule;
 
-/**
- * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
- */
-public class ApplicationTest extends ApplicationTestCase<Application> {
-    public ApplicationTest() {
-        super(Application.class);
-    }
+import retrofit2.Call;
+import retrofit2.http.GET;
+import retrofit2.http.Path;
+
+public interface BBCScheduleService {
+
+    @GET("{channel}/programmes/{scheduleType}.json")
+    Call<BBCSchedule> getSchedule(@Path("channel") String channel, @Path(value = "scheduleType", encoded = true) String scheduleType);
 }

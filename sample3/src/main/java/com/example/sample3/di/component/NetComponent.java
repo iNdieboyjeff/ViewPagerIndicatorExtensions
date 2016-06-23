@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015 Jeff Sutton
+ *  Copyright (c) 2015-2016 Jeff Sutton
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,12 +19,13 @@ package com.example.sample3.di.component;
 import com.example.sample3.di.module.ApplicationModule;
 import com.example.sample3.di.module.DataModule;
 import com.example.sample3.fragment.ChannelFragment;
+import com.example.sample3.service.BBCScheduleService;
 import com.google.gson.Gson;
-import com.squareup.okhttp.OkHttpClient;
 
 import javax.inject.Singleton;
 
 import dagger.Component;
+import okhttp3.OkHttpClient;
 
 /**
  * Created by jeff on 26/11/2015.
@@ -33,6 +34,10 @@ import dagger.Component;
 @Component(modules = {ApplicationModule.class, DataModule.class})
 public interface NetComponent {
     OkHttpClient okHttpClient();
+
     Gson gson();
+
+    BBCScheduleService bbcScheduleService();
+
     void inject(ChannelFragment fragment);
 }

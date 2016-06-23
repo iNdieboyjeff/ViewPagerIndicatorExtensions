@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~  Copyright (c) 2015 Jeff Sutton
+  ~  Copyright (c) 2015-2016 Jeff Sutton
   ~
   ~  Licensed under the Apache License, Version 2.0 (the "License");
   ~  you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     app:contentScrim="?attr/colorPrimary"
-    tools:context=".MainActivity">
+    tools:context=".activity.MainActivity">
 
 
     <android.support.design.widget.AppBarLayout
@@ -44,10 +44,10 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
             <ImageView
+                android:id="@+id/header"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:minHeight="100dp"
-                android:id="@+id/header"
                 android:scaleType="centerCrop"
                 android:src="@drawable/header_01"
                 app:layout_collapseMode="parallax"
@@ -59,19 +59,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"></android.support.v7.widget.Toolbar>
-
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
 
 
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
+
 
     <fragment
         android:id="@+id/fragment"
         android:name="com.example.sample3.fragment.MainActivityFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="com.example.sample3.fragment.MyBehavior"
+        app:layout_behavior="com.example.sample3.behaviour.RecyclerPositionBehavior"
         tools:layout="@layout/fragment_main"/>
+
+    <com.viewpagerindicator.CirclePageIndicator
+        android:id="@+id/indicator"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="10dp"
+        android:elevation="30dp"
+        android:paddingTop="3dp"
+        app:fillColor="#e307ea"
+        app:paddingEnd="4dp"
+        app:paddingStart="4dp"
+        app:radius="4dp"
+        app:strokeColor="#cf33e1"/>
 
 </android.support.design.widget.CoordinatorLayout>

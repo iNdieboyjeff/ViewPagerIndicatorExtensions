@@ -1,31 +1,35 @@
+/*
+ *  Copyright (c) 2015-2016 Jeff Sutton
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 package com.example.sample3.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.annotation.Generated;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.os.Parcelable.Creator;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-@Generated("org.jsonschema2pojo")
-public class Day implements Parcelable
-{
+import java.util.ArrayList;
+import java.util.List;
 
-    @SerializedName("date")
-    @Expose
-    private String date;
-    @SerializedName("has_next")
-    @Expose
-    private int hasNext;
-    @SerializedName("has_previous")
-    @Expose
-    private int hasPrevious;
-    @SerializedName("broadcasts")
-    @Expose
-    private List<Broadcast> broadcasts = new ArrayList<Broadcast>();
+import javax.annotation.Generated;
+
+@Generated("org.jsonschema2pojo")
+public class Day implements Parcelable {
+
     public final static Parcelable.Creator<Day> CREATOR = new Creator<Day>() {
 
 
@@ -42,79 +46,78 @@ public class Day implements Parcelable
             return (new Day[size]);
         }
 
-    }
-    ;
+    };
+    @SerializedName("date")
+    @Expose
+    private String date;
+    @SerializedName("has_next")
+    @Expose
+    private int hasNext;
+    @SerializedName("has_previous")
+    @Expose
+    private int hasPrevious;
+    @SerializedName("broadcasts")
+    @Expose
+    private List<Broadcast> broadcasts = new ArrayList<Broadcast>();
 
     /**
-     * 
-     * @return
-     *     The date
+     * @return The date
      */
     public String getDate() {
         return date;
     }
 
     /**
-     * 
-     * @param date
-     *     The date
+     * @param date The date
      */
     public void setDate(String date) {
         this.date = date;
     }
 
     /**
-     * 
-     * @return
-     *     The hasNext
+     * @return The hasNext
      */
     public int getHasNext() {
         return hasNext;
     }
 
     /**
-     * 
-     * @param hasNext
-     *     The has_next
+     * @param hasNext The has_next
      */
     public void setHasNext(int hasNext) {
         this.hasNext = hasNext;
     }
 
     /**
-     * 
-     * @return
-     *     The hasPrevious
+     * @return The hasPrevious
      */
     public int getHasPrevious() {
         return hasPrevious;
     }
 
     /**
-     * 
-     * @param hasPrevious
-     *     The has_previous
+     * @param hasPrevious The has_previous
      */
     public void setHasPrevious(int hasPrevious) {
         this.hasPrevious = hasPrevious;
     }
 
     /**
-     * 
-     * @return
-     *     The broadcasts
+     * @return The broadcasts
      */
     public List<Broadcast> getBroadcasts() {
         return broadcasts;
     }
 
     /**
-     * 
-     * @param broadcasts
-     *     The broadcasts
+     * @param broadcasts The broadcasts
      */
     public void setBroadcasts(List<Broadcast> broadcasts) {
         this.broadcasts = broadcasts;
+    }
+
+    public int describeContents() {
+        return 0;
     }
 
     public void writeToParcel(Parcel dest, int flags) {
@@ -122,10 +125,6 @@ public class Day implements Parcelable
         dest.writeValue(hasNext);
         dest.writeValue(hasPrevious);
         dest.writeList(broadcasts);
-    }
-
-    public int describeContents() {
-        return  0;
     }
 
 }

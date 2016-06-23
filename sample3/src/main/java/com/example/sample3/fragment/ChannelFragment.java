@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2015 Jeff Sutton
+ *  Copyright (c) 2015-2016 Jeff Sutton
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package com.example.sample3.fragment;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,23 +26,21 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.example.sample3.Application;
 import com.example.sample3.R;
 import com.example.sample3.adapter.list.ScheduleAdapter;
 import com.example.sample3.di.component.NetComponent;
+import com.example.sample3.event.ScheduleLoadedEvent;
 import com.example.sample3.model.BBCSchedule;
-import com.google.gson.Gson;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+import com.example.sample3.service.BBCScheduleService;
 
-import java.io.IOException;
+import org.greenrobot.eventbus.EventBus;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
@@ -52,28 +49,24 @@ import butterknife.ButterKnife;
  * Use the {@link ChannelFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ChannelFragment extends Fragment implements Callback {
+public class ChannelFragment extends Fragment implements retrofit2.Callback<BBCSchedule> {
 
-private static final String LOG_TAG = ChannelFragment.class.getSimpleName();
-
-    @Inject
-    OkHttpClient okHttpClient;
-
-    @Inject
-    Gson gson;
-
+    private static final String LOG_TAG = ChannelFragment.class.getSimpleName();
     private static final String CHANNEL_NAME = "channel_name";
-    private static final String SCHEDULE_LINK = "schedule_link";
+    private static final String CHANNEL_ID = "channel_id";
+    private static final String SCHEDULE_TYPE = "schedule_type";
     private static final String HEADER_IMAGE = "header_image";
-
-    private String mChannelName;
-    private String mScheduleLink;
-    private int mHeaderResource;
-
-    private BBCSchedule mSchedule;
-
-    @Bind(R.id.scheduleView)
+    @Inject
+    BBCScheduleService scheduleService;
+    @BindView(R.id.scheduleView)
     RecyclerView scheduleList;
+    @BindView(R.id.progressBar)
+    ProgressBar progress;
+    private String mChannelName;
+    private String mChannelId;
+    private String mScheduleType;
+    private int mHeaderResource;
+    private BBCSchedule mSchedule;
 
     public ChannelFragment() {
         // Required empty public constructor
@@ -83,19 +76,34 @@ private static final String LOG_TAG = ChannelFragment.class.getSimpleName();
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param channelDisplayName Parameter 1.
+     * @param channelId          Parameter 2.
+     * @param scheduleType
      * @return A new instance of fragment ChannelFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ChannelFragment newInstance(String param1, String param2, int param3) {
+    public static ChannelFragment newInstance(String channelDisplayName, String channelId, String scheduleType, int channelHeader) {
         ChannelFragment fragment = new ChannelFragment();
         Bundle args = new Bundle();
-        args.putString(CHANNEL_NAME, param1);
-        args.putString(SCHEDULE_LINK, param2);
-        args.putInt(HEADER_IMAGE, param3);
+        args.putString(CHANNEL_NAME, channelDisplayName);
+        args.putString(CHANNEL_ID, channelId);
+        args.putString(SCHEDULE_TYPE, scheduleType);
+        args.putInt(HEADER_IMAGE, channelHeader);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        NetComponent netComponent = ((Application) getActivity().getApplication()).getNetComponent();
+
+        if (netComponent != null) {
+            netComponent.inject(this);
+        } else {
+            Log.e(LOG_TAG, "netComponent is null");
+        }
+
     }
 
     @Override
@@ -103,13 +111,13 @@ private static final String LOG_TAG = ChannelFragment.class.getSimpleName();
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mChannelName = getArguments().getString(CHANNEL_NAME);
-            mScheduleLink = getArguments().getString(SCHEDULE_LINK);
+            mChannelId = getArguments().getString(CHANNEL_ID);
+            mScheduleType = getArguments().getString(SCHEDULE_TYPE);
             mHeaderResource = getArguments().getInt(HEADER_IMAGE);
         }
 
-        if (okHttpClient != null) {
-            Request request = new Request.Builder().url(mScheduleLink).build();
-            okHttpClient.newCall(request).enqueue(this);
+        if (scheduleService != null) {
+            scheduleService.getSchedule(mChannelId, mScheduleType).enqueue(this);
         } else {
             Log.e(LOG_TAG, "okHTTPclient is null");
         }
@@ -126,41 +134,22 @@ private static final String LOG_TAG = ChannelFragment.class.getSimpleName();
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        NetComponent netComponent = ((Application)getActivity().getApplication()).getNetComponent();
-
-        if (netComponent != null) {
-            netComponent.inject(this);
-        } else {
-            Log.e(LOG_TAG, "netComponent is null");
-        }
-
-    }
-
-    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         scheduleList.setLayoutManager(new LinearLayoutManager(getActivity()));
     }
 
     @Override
-    public void onFailure(Request request, IOException e) {
-
-    }
-
-    @Override
-    public void onResponse(Response response) throws IOException {
-        if (response.isSuccessful()) {
-            final String body = response.body().string();
-            mSchedule = gson.fromJson(body, BBCSchedule.class);
+    public void onResume() {
+        super.onResume();
+        if (mSchedule != null) {
             scheduleList.post(new Runnable() {
                 @Override
                 public void run() {
                     scheduleList.setAdapter(new ScheduleAdapter(mSchedule.getSchedule().getDay().getBroadcasts()));
+                    progress.setVisibility(View.GONE);
                 }
             });
-
         }
     }
 
@@ -176,5 +165,33 @@ private static final String LOG_TAG = ChannelFragment.class.getSimpleName();
             mHeaderResource = getArguments().getInt(HEADER_IMAGE);
         }
         return mHeaderResource;
+    }
+
+    @Override
+    public void onResponse(retrofit2.Call<BBCSchedule> call, final retrofit2.Response<BBCSchedule> response) {
+        if (response.isSuccessful()) {
+            scheduleList.post(new Runnable() {
+                @Override
+                public void run() {
+                    scheduleList.setAdapter(new ScheduleAdapter(response.body().getSchedule().getDay().getBroadcasts()));
+                    progress.setVisibility(View.GONE);
+                    EventBus.getDefault().post(new ScheduleLoadedEvent());
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onFailure(retrofit2.Call<BBCSchedule> call, Throwable t) {
+        if (mSchedule != null) {
+            scheduleList.post(new Runnable() {
+                @Override
+                public void run() {
+                    scheduleList.setAdapter(new ScheduleAdapter(mSchedule.getSchedule().getDay().getBroadcasts()));
+                    progress.setVisibility(View.GONE);
+                    EventBus.getDefault().post(new ScheduleLoadedEvent());
+                }
+            });
+        }
     }
 }
