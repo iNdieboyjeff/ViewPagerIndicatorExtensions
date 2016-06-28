@@ -23,7 +23,15 @@ import android.util.AttributeSet;
 import android.view.View;
 
 /**
- * Created by jeff on 26/11/2015.
+ * <p>This is a Behaviour for use with CoordinatorLayout. It allows you to position a view
+ * beneath a {@link android.support.design.widget.CollapsingToolbarLayout} to take account
+ * of it's variable size.</p>
+ * <p>You can specify this in XML using <br />
+ * app:layout_behavior="com.example.sample3.behaviour.RecyclerPositionBehavior"<br />
+ * </p>
+ *
+ * @author Jeff Sutton
+ * @version 1.0 (26/11/2015).
  */
 public class RecyclerPositionBehavior extends AppBarLayout.ScrollingViewBehavior {
 

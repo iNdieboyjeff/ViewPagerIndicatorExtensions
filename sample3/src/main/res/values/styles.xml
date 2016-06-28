@@ -48,4 +48,19 @@
         <item name="android:background">@drawable/tab_line_selector</item>
     </style>
 
+    <style name="DemoButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minWidth">40dp</item>
+    </style>
+
+    <style name="PlayerTheme" parent="@style/AppTheme">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
 </resources>

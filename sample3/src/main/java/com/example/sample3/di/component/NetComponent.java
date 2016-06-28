@@ -19,6 +19,7 @@ package com.example.sample3.di.component;
 import com.example.sample3.di.module.ApplicationModule;
 import com.example.sample3.di.module.DataModule;
 import com.example.sample3.fragment.ChannelFragment;
+import com.example.sample3.manager.ScheduleManager;
 import com.example.sample3.service.BBCScheduleService;
 import com.google.gson.Gson;
 
@@ -40,4 +41,6 @@ public interface NetComponent {
     BBCScheduleService bbcScheduleService();
 
     void inject(ChannelFragment fragment);
+
+    void inject(ScheduleManager manager);
 }

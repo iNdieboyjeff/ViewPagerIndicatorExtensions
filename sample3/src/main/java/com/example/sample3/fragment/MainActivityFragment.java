@@ -16,12 +16,16 @@
 
 package com.example.sample3.fragment;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,12 +33,18 @@ import android.view.animation.AnimationUtils;
 
 import com.example.sample3.R;
 import com.example.sample3.activity.MainActivity;
+import com.example.sample3.activity.PlayerActivity;
 import com.example.sample3.adapter.pager.ChannelFragmentPagerAdapter;
+import com.example.sample3.event.PlayChannelEvent;
 import com.example.sample3.event.ScheduleLoadedEvent;
+import com.example.sample3.manager.ScheduleManager;
+import com.google.android.exoplayer.util.Util;
 import com.viewpagerindicator.CirclePageIndicator;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -43,6 +53,8 @@ import butterknife.ButterKnife;
  * A placeholder fragment containing a simple view.
  */
 public class MainActivityFragment extends Fragment implements ViewPager.OnPageChangeListener, View.OnTouchListener {
+
+    private static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
     private static final Handler handler = new Handler();
     private static final int CIRCLE_INDICATOR_SHOW_TIME = 1000;
@@ -73,6 +85,9 @@ public class MainActivityFragment extends Fragment implements ViewPager.OnPageCh
     @BindView(R.id.pager)
     ViewPager mPager;
 
+    @Inject
+    ScheduleManager scheduleManager;
+
     public MainActivityFragment() {
     }
 
@@ -81,13 +96,15 @@ public class MainActivityFragment extends Fragment implements ViewPager.OnPageCh
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this, view);
+        setHasOptionsMenu(true);
+
         return view;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        mPager.setAdapter(new ChannelFragmentPagerAdapter(this.getFragmentManager()));
+        mPager.setAdapter(new ChannelFragmentPagerAdapter(getActivity(), this.getFragmentManager()));
         mPager.setOffscreenPageLimit(4);
         mPager.setOnTouchListener(this);
         handler.postDelayed(hideRunnable, 2 * CIRCLE_INDICATOR_SHOW_TIME);
@@ -108,6 +125,7 @@ public class MainActivityFragment extends Fragment implements ViewPager.OnPageCh
     @Override
     public void onResume() {
         super.onResume();
+        updateActivityTitle();
     }
 
     @Override
@@ -117,20 +135,20 @@ public class MainActivityFragment extends Fragment implements ViewPager.OnPageCh
     }
 
     @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-        handler.removeCallbacks(hideRunnable);
-        handler.post(showRunnable);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_play) {
+           playChannel();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onPageSelected(final int position) {
-        handler.postDelayed(hideRunnable, CIRCLE_INDICATOR_SHOW_TIME);
-        updateActivityTitle();
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-
+    private void playChannel() {
+        Intent mpdIntent = new Intent(getActivity(), PlayerActivity.class)
+                .setData(Uri.parse(((ChannelFragmentPagerAdapter) mPager.getAdapter()).getStreamingURL(mPager.getCurrentItem())))
+                .putExtra(PlayerActivity.CONTENT_ID_EXTRA, "")
+                .putExtra(PlayerActivity.CONTENT_TYPE_EXTRA, Util.TYPE_HLS)
+                .putExtra(PlayerActivity.PROVIDER_EXTRA, "");
+        startActivity(mpdIntent);
     }
 
     private void updateActivityTitle() {
@@ -151,6 +169,23 @@ public class MainActivityFragment extends Fragment implements ViewPager.OnPageCh
     }
 
     @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        handler.removeCallbacks(hideRunnable);
+        handler.post(showRunnable);
+    }
+
+    @Override
+    public void onPageSelected(final int position) {
+        handler.postDelayed(hideRunnable, CIRCLE_INDICATOR_SHOW_TIME);
+        updateActivityTitle();
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
+    }
+
+    @Override
     public boolean onTouch(View v, MotionEvent event) {
         handler.removeCallbacks(hideRunnable);
         handler.post(showRunnable);
@@ -159,7 +194,15 @@ public class MainActivityFragment extends Fragment implements ViewPager.OnPageCh
 
     @Subscribe
     public void onScheduleLoadedEvent(ScheduleLoadedEvent event) {
+        Log.d(LOG_TAG, "onScheduleLoadedEvent <-");
+        mPager.setAdapter(new ChannelFragmentPagerAdapter(getActivity(), this.getFragmentManager()));
         updateActivityTitle();
+        mPager.getAdapter().notifyDataSetChanged();
+    }
+
+    @Subscribe
+    public void onPlayChannelEvent(PlayChannelEvent event) {
+        playChannel();
     }
 
 }

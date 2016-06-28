@@ -1,0 +1,28 @@
+{
+  "channels": [
+    {
+      "name":"BBC One",
+      "scheduleFormat":"bbcjson",
+      "channelId":"bbcone",
+      "scheduleType":"schedules/london",
+      "logo": "bbc_one_ident",
+      "stream":"http://nasatv-lh.akamaihd.net/i/NASA_101@319270/master.m3u8"
+    },
+    {
+      "name":"BBC Two",
+      "scheduleFormat":"bbcjson",
+      "channelId":"bbctwo",
+      "scheduleType":"schedules/england",
+      "logo": "bbc_two_ident",
+      "stream":"http://nasatv-lh.akamaihd.net/i/NASA_101@319270/master.m3u8"
+    },
+    {
+      "name":"BBC News",
+      "scheduleFormat":"bbcjson",
+      "channelId":"bbcnews",
+      "scheduleType":"schedules",
+      "logo": "header_01",
+      "stream":"http://nasatv-lh.akamaihd.net/i/NASA_101@319270/master.m3u8"
+    }
+  ]
+}

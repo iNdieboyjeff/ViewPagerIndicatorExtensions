@@ -16,14 +16,8 @@
 
 package com.example.sample3.event;
 
-import android.util.Log;
+public class PlayChannelEvent {
 
-public class ScheduleLoadedEvent {
-
-    private static final String LOG_TAG = ScheduleLoadedEvent.class.getSimpleName();
-
-
-    public ScheduleLoadedEvent() {
-        Log.d(LOG_TAG, "New ScheduleLoadedEvent()");
+    public PlayChannelEvent() {
     }
 }

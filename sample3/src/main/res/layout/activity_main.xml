@@ -29,6 +29,7 @@
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="250dp"
+        android:id="@+id/appbar"
         android:fitsSystemWindows="true"
         android:theme="@style/AppTheme.AppBarOverlay"
         app:layout_scrollFlags="scroll|enterAlways">
@@ -41,6 +42,7 @@
             app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginEnd="10dp"
             app:expandedTitleMarginStart="20dp"
+
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
             <ImageView
@@ -87,5 +89,15 @@
         app:paddingStart="4dp"
         app:radius="4dp"
         app:strokeColor="#cf33e1"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_margin="@dimen/activity_horizontal_margin"
+        android:src="@drawable/ic_play_arrow_white_36dp"
+        app:layout_anchor="@id/appbar"
+        android:id="@+id/fab"
+        app:layout_anchorGravity="bottom|right"
+        />
 
 </android.support.design.widget.CoordinatorLayout>

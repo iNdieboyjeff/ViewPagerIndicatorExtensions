@@ -16,51 +16,74 @@
 
 package com.example.sample3.adapter.pager;
 
+import android.app.Activity;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.example.sample3.Application;
 import com.example.sample3.R;
 import com.example.sample3.fragment.ChannelFragment;
-
-import java.util.ArrayList;
+import com.example.sample3.manager.ScheduleManager;
+import com.example.sample3.model.Channel;
 
 /**
  * Created by jeff on 19/11/2015.
  */
 public class ChannelFragmentPagerAdapter extends FragmentPagerAdapter {
 
-    static ArrayList<ChannelFragment> mItems = new ArrayList<>();
+    private static final String LOG_TAG = ChannelFragmentPagerAdapter.class.getSimpleName();
 
-    public ChannelFragmentPagerAdapter(FragmentManager fm) {
+    Activity activity;
+
+    ScheduleManager scheduleManager;
+
+    public ChannelFragmentPagerAdapter(Activity activity, FragmentManager fm) {
         super(fm);
-        if (mItems.size() < 3) {
-            mItems.add(ChannelFragment.newInstance("BBC One", "bbcone", "schedules/london", R.drawable.bbc_one_ident));
-            mItems.add(ChannelFragment.newInstance("BBC Two", "bbctwo", "schedules/england", R.drawable.bbc_two_ident));
-            mItems.add(ChannelFragment.newInstance("BBC News", "bbcnews", "schedules", R.drawable.header_01));
-        }
+        this.activity = activity;
+        scheduleManager = ScheduleManager.getInstance((Application) activity.getApplication());
     }
 
     @Override
     public Fragment getItem(int position) {
-        return mItems.get(position);
-    }
-
-    @Override
-    public int getCount() {
-        if (mItems == null) {
-            return 0;
+        Channel c = scheduleManager.getChannelConfig().getChannels().get(position);
+        if (c != null) {
+            return ChannelFragment.newInstance(scheduleManager.getChannelConfig().getChannels().get(position));
         } else {
-            return mItems.size();
+            return null;
         }
     }
 
     @Override
+    public int getCount() {
+        if (scheduleManager == null || scheduleManager.getChannelConfig() == null) {
+            return 0;
+        } else {
+            return scheduleManager.getChannelConfig().getChannels().size();
+        }
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        super.notifyDataSetChanged();
+    }
+
+    @Override
     public CharSequence getPageTitle(int position) {
-        return mItems.get(position).getChannelName();
+        if (scheduleManager == null || scheduleManager.getChannelConfig() == null || scheduleManager.getChannelConfig().getChannels().size() < position)
+            return "";
+        return scheduleManager.getChannelConfig().getChannels().get(position).getName();
     }
 
     public int getPageHeaderImage(int position) {
-        return mItems.get(position).getHeaderResource();
+        if (scheduleManager == null || scheduleManager.getChannelConfig() == null || scheduleManager.getChannelConfig().getChannels().size() < position)
+            return R.drawable.header_01;
+        return activity.getResources().getIdentifier(scheduleManager.getChannelConfig().getChannels().get(position).getLogo(), "drawable", activity.getPackageName());
+    }
+
+    public String getStreamingURL(int position) {
+        if (scheduleManager == null || scheduleManager.getChannelConfig() == null || scheduleManager.getChannelConfig().getChannels().size() < position)
+            return "";
+        return scheduleManager.getChannelConfig().getChannels().get(position).getStream();
     }
 }

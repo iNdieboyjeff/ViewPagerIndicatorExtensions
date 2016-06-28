@@ -23,12 +23,17 @@ import com.example.sample3.service.BBCScheduleService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.IOException;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.Cache;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -51,6 +56,21 @@ public class DataModule {
     OkHttpClient provideOkHttpClient(Cache cache) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .cache(cache)
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request original = chain.request();
+
+                        Request request = original.newBuilder()
+                                .header("User-Agent", "Sample App")
+                                .header("Accept", "application/json")
+                                .header("X-Clacks-Overhead", "GNU Terry Pratchett")
+                                .method(original.method(), original.body())
+                                .build();
+
+                        return chain.proceed(request);
+                    }
+                })
                 .addInterceptor(new OKHttpLoggingInterceptor())
                 .build();
         return okHttpClient;

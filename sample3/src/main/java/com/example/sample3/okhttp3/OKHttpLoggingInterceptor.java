@@ -53,8 +53,10 @@ public class OKHttpLoggingInterceptor implements Interceptor {
                 Log.d(LOG_TAG, "Request body:  " + buffer.readUtf8());
             }
         } catch (Exception ignored) {
+            ignored.printStackTrace();
         }
 
+        Log.d(LOG_TAG, "Request headers:  ");
         Headers headers = request.headers();
         for (Map.Entry<String, List<String>> entry : headers.toMultimap().entrySet()) {
             Log.d(LOG_TAG, "Request head:  " + entry.getKey()

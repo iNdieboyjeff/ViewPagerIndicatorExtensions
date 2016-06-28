@@ -36,9 +36,13 @@ public class Application extends android.app.Application {
                 .applicationModule(new ApplicationModule(this))
                 .dataModule(new DataModule())
                 .build();
+
+
     }
 
     public NetComponent getNetComponent() {
         return mNetComponent;
     }
+
+
 }
