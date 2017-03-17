@@ -47,12 +47,11 @@ import static android.widget.LinearLayout.VERTICAL;
  */
 public class CirclePageIndicator extends View implements PageIndicator {
     private static final int INVALID_POINTER = -1;
-
-    private float mRadius;
-    private float mSpacing;
     private final Paint mPaintPageFill = new Paint(ANTI_ALIAS_FLAG);
     private final Paint mPaintStroke = new Paint(ANTI_ALIAS_FLAG);
     private final Paint mPaintFill = new Paint(ANTI_ALIAS_FLAG);
+    private float mRadius;
+    private float mSpacing;
     private ViewPager mViewPager;
     private ViewPager.OnPageChangeListener mListener;
     private int mCurrentPage;
@@ -122,18 +121,12 @@ public class CirclePageIndicator extends View implements PageIndicator {
         mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
     }
 
-
-    public void setCentered(boolean centered) {
-        mCentered = centered;
-        invalidate();
-    }
-
     public boolean isCentered() {
         return mCentered;
     }
 
-    public void setPageColor(int pageColor) {
-        mPaintPageFill.setColor(pageColor);
+    public void setCentered(boolean centered) {
+        mCentered = centered;
         invalidate();
     }
 
@@ -141,13 +134,22 @@ public class CirclePageIndicator extends View implements PageIndicator {
         return mPaintPageFill.getColor();
     }
 
-    public void setFillColor(int fillColor) {
-        mPaintFill.setColor(fillColor);
+    public void setPageColor(int pageColor) {
+        mPaintPageFill.setColor(pageColor);
         invalidate();
     }
 
     public int getFillColor() {
         return mPaintFill.getColor();
+    }
+
+    public void setFillColor(int fillColor) {
+        mPaintFill.setColor(fillColor);
+        invalidate();
+    }
+
+    public int getOrientation() {
+        return mOrientation;
     }
 
     public void setOrientation(int orientation) {
@@ -163,8 +165,8 @@ public class CirclePageIndicator extends View implements PageIndicator {
         }
     }
 
-    public int getOrientation() {
-        return mOrientation;
+    public int getStrokeColor() {
+        return mPaintStroke.getColor();
     }
 
     public void setStrokeColor(int strokeColor) {
@@ -172,8 +174,8 @@ public class CirclePageIndicator extends View implements PageIndicator {
         invalidate();
     }
 
-    public int getStrokeColor() {
-        return mPaintStroke.getColor();
+    public float getStrokeWidth() {
+        return mPaintStroke.getStrokeWidth();
     }
 
     public void setStrokeWidth(float strokeWidth) {
@@ -181,8 +183,8 @@ public class CirclePageIndicator extends View implements PageIndicator {
         invalidate();
     }
 
-    public float getStrokeWidth() {
-        return mPaintStroke.getStrokeWidth();
+    public float getRadius() {
+        return mRadius;
     }
 
     public void setRadius(float radius) {
@@ -190,18 +192,17 @@ public class CirclePageIndicator extends View implements PageIndicator {
         invalidate();
     }
 
-    public float getRadius() {
-        return mRadius;
+    public float getSpacing() {
+        return mSpacing;
     }
-
 
     public void setSpacing(float spacing) {
         mSpacing = spacing;
         invalidate();
     }
 
-    public float getSpacing() {
-        return mSpacing;
+    public boolean isSnap() {
+        return mSnap;
     }
 
     public void setSnap(boolean snap) {
@@ -209,8 +210,88 @@ public class CirclePageIndicator extends View implements PageIndicator {
         invalidate();
     }
 
-    public boolean isSnap() {
-        return mSnap;
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        if (super.onTouchEvent(ev)) {
+            return true;
+        }
+        if ((mViewPager == null) || (mViewPager.getAdapter().getCount() == 0)) {
+            return false;
+        }
+
+        final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
+                mLastMotionX = ev.getX();
+                break;
+
+            case MotionEvent.ACTION_MOVE: {
+                final int activePointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
+                final float x = MotionEventCompat.getX(ev, activePointerIndex);
+                final float deltaX = x - mLastMotionX;
+
+                if (!mIsDragging) {
+                    if (Math.abs(deltaX) > mTouchSlop) {
+                        mIsDragging = true;
+                    }
+                }
+
+                if (mIsDragging) {
+                    mLastMotionX = x;
+                    if (mViewPager.isFakeDragging() || mViewPager.beginFakeDrag()) {
+                        mViewPager.fakeDragBy(deltaX);
+                    }
+                }
+
+                break;
+            }
+
+            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_UP:
+                if (!mIsDragging) {
+                    final int count = mViewPager.getAdapter().getCount();
+                    final int width = getWidth();
+                    final float halfWidth = width / 2f;
+                    final float sixthWidth = width / 6f;
+
+                    if ((mCurrentPage > 0) && (ev.getX() < halfWidth - sixthWidth)) {
+                        if (action != MotionEvent.ACTION_CANCEL) {
+                            mViewPager.setCurrentItem(mCurrentPage - 1);
+                        }
+                        return true;
+                    } else if ((mCurrentPage < count - 1) && (ev.getX() > halfWidth + sixthWidth)) {
+                        if (action != MotionEvent.ACTION_CANCEL) {
+                            mViewPager.setCurrentItem(mCurrentPage + 1);
+                        }
+                        return true;
+                    }
+                }
+
+                mIsDragging = false;
+                mActivePointerId = INVALID_POINTER;
+                if (mViewPager.isFakeDragging()) mViewPager.endFakeDrag();
+                break;
+
+            case MotionEventCompat.ACTION_POINTER_DOWN: {
+                final int index = MotionEventCompat.getActionIndex(ev);
+                mLastMotionX = MotionEventCompat.getX(ev, index);
+                mActivePointerId = MotionEventCompat.getPointerId(ev, index);
+                break;
+            }
+
+            case MotionEventCompat.ACTION_POINTER_UP:
+                final int pointerIndex = MotionEventCompat.getActionIndex(ev);
+                final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
+                if (pointerId == mActivePointerId) {
+                    final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
+                    mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
+                }
+                mLastMotionX = MotionEventCompat.getX(ev, MotionEventCompat.findPointerIndex(ev, mActivePointerId));
+                break;
+        }
+
+        return true;
     }
 
     @Override
@@ -297,90 +378,13 @@ public class CirclePageIndicator extends View implements PageIndicator {
         canvas.drawCircle(dX, dY, mRadius, mPaintFill);
     }
 
-    public boolean onTouchEvent(MotionEvent ev) {
-        if (super.onTouchEvent(ev)) {
-            return true;
-        }
-        if ((mViewPager == null) || (mViewPager.getAdapter().getCount() == 0)) {
-            return false;
-        }
-
-        final int action = ev.getAction() & MotionEventCompat.ACTION_MASK;
-        switch (action) {
-            case MotionEvent.ACTION_DOWN:
-                mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
-                mLastMotionX = ev.getX();
-                break;
-
-            case MotionEvent.ACTION_MOVE: {
-                final int activePointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
-                final float x = MotionEventCompat.getX(ev, activePointerIndex);
-                final float deltaX = x - mLastMotionX;
-
-                if (!mIsDragging) {
-                    if (Math.abs(deltaX) > mTouchSlop) {
-                        mIsDragging = true;
-                    }
-                }
-
-                if (mIsDragging) {
-                    mLastMotionX = x;
-                    if (mViewPager.isFakeDragging() || mViewPager.beginFakeDrag()) {
-                        mViewPager.fakeDragBy(deltaX);
-                    }
-                }
-
-                break;
-            }
-
-            case MotionEvent.ACTION_CANCEL:
-            case MotionEvent.ACTION_UP:
-                if (!mIsDragging) {
-                    final int count = mViewPager.getAdapter().getCount();
-                    final int width = getWidth();
-                    final float halfWidth = width / 2f;
-                    final float sixthWidth = width / 6f;
-
-                    if ((mCurrentPage > 0) && (ev.getX() < halfWidth - sixthWidth)) {
-                        if (action != MotionEvent.ACTION_CANCEL) {
-                            mViewPager.setCurrentItem(mCurrentPage - 1);
-                        }
-                        return true;
-                    } else if ((mCurrentPage < count - 1) && (ev.getX() > halfWidth + sixthWidth)) {
-                        if (action != MotionEvent.ACTION_CANCEL) {
-                            mViewPager.setCurrentItem(mCurrentPage + 1);
-                        }
-                        return true;
-                    }
-                }
-
-                mIsDragging = false;
-                mActivePointerId = INVALID_POINTER;
-                if (mViewPager.isFakeDragging()) mViewPager.endFakeDrag();
-                break;
-
-            case MotionEventCompat.ACTION_POINTER_DOWN: {
-                final int index = MotionEventCompat.getActionIndex(ev);
-                mLastMotionX = MotionEventCompat.getX(ev, index);
-                mActivePointerId = MotionEventCompat.getPointerId(ev, index);
-                break;
-            }
-
-            case MotionEventCompat.ACTION_POINTER_UP:
-                final int pointerIndex = MotionEventCompat.getActionIndex(ev);
-                final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
-                if (pointerId == mActivePointerId) {
-                    final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-                    mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
-                }
-                mLastMotionX = MotionEventCompat.getX(ev, MotionEventCompat.findPointerIndex(ev, mActivePointerId));
-                break;
-        }
-
-        return true;
-    }
-
     @Override
+    public Parcelable onSaveInstanceState() {
+        Parcelable superState = super.onSaveInstanceState();
+        SavedState savedState = new SavedState(superState);
+        savedState.currentPage = mCurrentPage;
+        return savedState;
+    }    @Override
     public void setViewPager(ViewPager view) {
         if (mViewPager == view) {
             return;
@@ -397,12 +401,31 @@ public class CirclePageIndicator extends View implements PageIndicator {
     }
 
     @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        SavedState savedState = (SavedState) state;
+        super.onRestoreInstanceState(savedState.getSuperState());
+        mCurrentPage = savedState.currentPage;
+        mSnapPage = savedState.currentPage;
+        requestLayout();
+    }    @Override
     public void setViewPager(ViewPager view, int initialPosition) {
         setViewPager(view);
         setCurrentItem(initialPosition);
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see android.view.View#onMeasure(int, int)
+     */
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (mOrientation == HORIZONTAL) {
+            setMeasuredDimension(measureLong(widthMeasureSpec), measureShort(heightMeasureSpec));
+        } else {
+            setMeasuredDimension(measureShort(widthMeasureSpec), measureLong(heightMeasureSpec));
+        }
+    }    @Override
     public void setCurrentItem(int item) {
         if (mViewPager == null) {
             throw new IllegalStateException("ViewPager has not been bound.");
@@ -412,18 +435,59 @@ public class CirclePageIndicator extends View implements PageIndicator {
         invalidate();
     }
 
-    @Override
+    /**
+     * Determines the width of this view
+     *
+     * @param measureSpec A measureSpec packed into an int
+     * @return The width of the view, honoring constraints from measureSpec
+     */
+    private int measureLong(int measureSpec) {
+        int result;
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
+
+        if ((specMode == MeasureSpec.EXACTLY) || (mViewPager == null)) {
+            //We were told how big to be
+            result = specSize;
+        } else {
+            //Calculate the width according the views count
+            final int count = mViewPager.getAdapter().getCount();
+            result = (int) (getPaddingLeft() + getPaddingRight()
+                    + (count * 2 * mRadius) + (count - 1) * mRadius + 1);
+            //Respect AT_MOST value if that was what is called for by measureSpec
+            if (specMode == MeasureSpec.AT_MOST) {
+                result = Math.min(result, specSize);
+            }
+        }
+        return result;
+    }    @Override
     public void notifyDataSetChanged() {
         invalidate();
     }
 
-    @Override
-    public void onPageScrollStateChanged(int state) {
-        mScrollState = state;
+    /**
+     * Determines the height of this view
+     *
+     * @param measureSpec A measureSpec packed into an int
+     * @return The height of the view, honoring constraints from measureSpec
+     */
+    private int measureShort(int measureSpec) {
+        int result;
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
 
-        if (mListener != null) {
-            mListener.onPageScrollStateChanged(state);
+        if (specMode == MeasureSpec.EXACTLY) {
+            //We were told how big to be
+            result = specSize;
+        } else {
+            //Measure the height
+            result = (int) (2 * mRadius + getPaddingTop() + getPaddingBottom() + 1);
+            //Respect AT_MOST value if that was what is called for by measureSpec
+            if (specMode == MeasureSpec.AT_MOST) {
+                result = Math.min(result, specSize);
+            }
         }
+        return result;
     }
 
     @Override
@@ -451,96 +515,30 @@ public class CirclePageIndicator extends View implements PageIndicator {
     }
 
     @Override
+    public void onPageScrollStateChanged(int state) {
+        mScrollState = state;
+
+        if (mListener != null) {
+            mListener.onPageScrollStateChanged(state);
+        }
+    }    @Override
     public void setOnPageChangeListener(ViewPager.OnPageChangeListener listener) {
         mListener = listener;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see android.view.View#onMeasure(int, int)
-     */
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        if (mOrientation == HORIZONTAL) {
-            setMeasuredDimension(measureLong(widthMeasureSpec), measureShort(heightMeasureSpec));
-        } else {
-            setMeasuredDimension(measureShort(widthMeasureSpec), measureLong(heightMeasureSpec));
-        }
-    }
-
-    /**
-     * Determines the width of this view
-     *
-     * @param measureSpec
-     *            A measureSpec packed into an int
-     * @return The width of the view, honoring constraints from measureSpec
-     */
-    private int measureLong(int measureSpec) {
-        int result;
-        int specMode = MeasureSpec.getMode(measureSpec);
-        int specSize = MeasureSpec.getSize(measureSpec);
-
-        if ((specMode == MeasureSpec.EXACTLY) || (mViewPager == null)) {
-            //We were told how big to be
-            result = specSize;
-        } else {
-            //Calculate the width according the views count
-            final int count = mViewPager.getAdapter().getCount();
-            result = (int)(getPaddingLeft() + getPaddingRight()
-                    + (count * 2 * mRadius) + (count - 1) * mRadius + 1);
-            //Respect AT_MOST value if that was what is called for by measureSpec
-            if (specMode == MeasureSpec.AT_MOST) {
-                result = Math.min(result, specSize);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Determines the height of this view
-     *
-     * @param measureSpec
-     *            A measureSpec packed into an int
-     * @return The height of the view, honoring constraints from measureSpec
-     */
-    private int measureShort(int measureSpec) {
-        int result;
-        int specMode = MeasureSpec.getMode(measureSpec);
-        int specSize = MeasureSpec.getSize(measureSpec);
-
-        if (specMode == MeasureSpec.EXACTLY) {
-            //We were told how big to be
-            result = specSize;
-        } else {
-            //Measure the height
-            result = (int)(2 * mRadius + getPaddingTop() + getPaddingBottom() + 1);
-            //Respect AT_MOST value if that was what is called for by measureSpec
-            if (specMode == MeasureSpec.AT_MOST) {
-                result = Math.min(result, specSize);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public void onRestoreInstanceState(Parcelable state) {
-        SavedState savedState = (SavedState)state;
-        super.onRestoreInstanceState(savedState.getSuperState());
-        mCurrentPage = savedState.currentPage;
-        mSnapPage = savedState.currentPage;
-        requestLayout();
-    }
-
-    @Override
-    public Parcelable onSaveInstanceState() {
-        Parcelable superState = super.onSaveInstanceState();
-        SavedState savedState = new SavedState(superState);
-        savedState.currentPage = mCurrentPage;
-        return savedState;
-    }
-
     static class SavedState extends BaseSavedState {
+        @SuppressWarnings("UnusedDeclaration")
+        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
         int currentPage;
 
         public SavedState(Parcelable superState) {
@@ -557,18 +555,15 @@ public class CirclePageIndicator extends View implements PageIndicator {
             super.writeToParcel(dest, flags);
             dest.writeInt(currentPage);
         }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
-            @Override
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
     }
+
+
+
+
+
+
+
+
+
+
 }

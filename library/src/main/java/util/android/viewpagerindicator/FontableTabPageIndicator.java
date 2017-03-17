@@ -17,15 +17,12 @@
 package util.android.viewpagerindicator;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.util.LruCache;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +34,8 @@ import com.viewpagerindicator.IcsLinearLayout;
 import com.viewpagerindicator.PageIndicator;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import util.android.textviews.FontTextView;
 import util.android.textviews.TypefaceCache;
@@ -48,31 +46,22 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 public class FontableTabPageIndicator extends HorizontalScrollView implements PageIndicator {
 
     private static final String LOGTAG = FontableTabPageIndicator.class.getSimpleName();
-
+    /**
+     * Title text used when no title is provided by the adapter.
+     */
+    private static final CharSequence EMPTY_TITLE = "";
     private Typeface normalText;
     private Typeface selectedText;
-
-
-    /** Title text used when no title is provided by the adapter. */
-    private static final CharSequence EMPTY_TITLE = "";
-
-    /**
-     * Interface for a callback when the selected tab has been reselected.
-     */
-    public interface OnTabReselectedListener {
-        /**
-         * Callback when the selected tab has been reselected.
-         *
-         * @param position Position of the current center item.
-         */
-        void onTabReselected(int position);
-    }
-
     private Runnable mTabSelector;
-
+    private IcsLinearLayout mTabLayout;
+    private ViewPager mViewPager;
+    private ViewPager.OnPageChangeListener mListener;
+    private int mMaxTabWidth;
+    private int mSelectedTabIndex;
+    private OnTabReselectedListener mTabReselectedListener;
     private final OnClickListener mTabClickListener = new OnClickListener() {
         public void onClick(View view) {
-            TabView tabView = (TabView)view;
+            TabView tabView = (TabView) view;
             final int oldSelected = mViewPager.getCurrentItem();
             final int newSelected = tabView.getIndex();
             mViewPager.setCurrentItem(newSelected);
@@ -82,30 +71,10 @@ public class FontableTabPageIndicator extends HorizontalScrollView implements Pa
         }
     };
 
-    private IcsLinearLayout mTabLayout;
-
-    private ViewPager mViewPager;
-    private ViewPager.OnPageChangeListener mListener;
-
-    private int mMaxTabWidth;
-    private int mSelectedTabIndex;
-
-    private OnTabReselectedListener mTabReselectedListener;
-
-
     public FontableTabPageIndicator(Context context) {
         super(context, null);
         init(context, null);
     }
-
-    public FontableTabPageIndicator(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context, attrs);
-        setHorizontalScrollBarEnabled(false);
-        mTabLayout = new IcsLinearLayout(context, R.attr.vpiTabPageIndicatorStyle);
-        addView(mTabLayout, new ViewGroup.LayoutParams(WRAP_CONTENT, MATCH_PARENT));
-    }
-
 
     private void init(Context context, AttributeSet attrs) {
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.FontableTabPageIndicator);
@@ -116,13 +85,13 @@ public class FontableTabPageIndicator extends HorizontalScrollView implements Pa
                 try {
                     normalText = setATypeface(a.getString(attr));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).log(Level.OFF, e.getMessage(), e);
                 }
             } else if (attr == R.styleable.FontableTabPageIndicator_fontFamilySelected) {
                 try {
                     selectedText = setATypeface(a.getString(attr));
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).log(Level.OFF, e.getMessage(), e);
                 }
             }
 
@@ -132,6 +101,15 @@ public class FontableTabPageIndicator extends HorizontalScrollView implements Pa
 
     private Typeface setATypeface(String font) throws IOException {
         return TypefaceCache.loadTypeface(getContext(), font);
+    }
+
+
+    public FontableTabPageIndicator(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(context, attrs);
+        setHorizontalScrollBarEnabled(false);
+        mTabLayout = new IcsLinearLayout(context, R.attr.vpiTabPageIndicatorStyle);
+        addView(mTabLayout, new ViewGroup.LayoutParams(WRAP_CONTENT, MATCH_PARENT));
     }
 
     public void setOnTabReselectedListener(OnTabReselectedListener listener) {
@@ -147,7 +125,7 @@ public class FontableTabPageIndicator extends HorizontalScrollView implements Pa
         final int childCount = mTabLayout.getChildCount();
         if (childCount > 1 && (widthMode == MeasureSpec.EXACTLY || widthMode == MeasureSpec.AT_MOST)) {
             if (childCount > 2) {
-                mMaxTabWidth = (int)(MeasureSpec.getSize(widthMeasureSpec) * 0.4f);
+                mMaxTabWidth = (int) (MeasureSpec.getSize(widthMeasureSpec) * 0.4f);
             } else {
                 mMaxTabWidth = MeasureSpec.getSize(widthMeasureSpec) / 2;
             }
@@ -212,13 +190,6 @@ public class FontableTabPageIndicator extends HorizontalScrollView implements Pa
     }
 
     @Override
-    public void onPageScrollStateChanged(int arg0) {
-        if (mListener != null) {
-            mListener.onPageScrollStateChanged(arg0);
-        }
-    }
-
-    @Override
     public void onPageScrolled(int arg0, float arg1, int arg2) {
         if (mListener != null) {
             mListener.onPageScrolled(arg0, arg1, arg2);
@@ -230,6 +201,13 @@ public class FontableTabPageIndicator extends HorizontalScrollView implements Pa
         setCurrentItem(arg0);
         if (mListener != null) {
             mListener.onPageSelected(arg0);
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int arg0) {
+        if (mListener != null) {
+            mListener.onPageScrollStateChanged(arg0);
         }
     }
 
@@ -248,32 +226,6 @@ public class FontableTabPageIndicator extends HorizontalScrollView implements Pa
         mViewPager = view;
         view.setOnPageChangeListener(this);
         notifyDataSetChanged();
-    }
-
-    public void notifyDataSetChanged() {
-        mTabLayout.removeAllViews();
-        PagerAdapter adapter = mViewPager.getAdapter();
-        IconPagerAdapter iconAdapter = null;
-        if (adapter instanceof IconPagerAdapter) {
-            iconAdapter = (IconPagerAdapter)adapter;
-        }
-        final int count = adapter.getCount();
-        for (int i = 0; i < count; i++) {
-            CharSequence title = adapter.getPageTitle(i);
-            if (title == null) {
-                title = EMPTY_TITLE;
-            }
-            int iconResId = 0;
-            if (iconAdapter != null) {
-                iconResId = iconAdapter.getIconResId(i);
-            }
-            addTab(i, title, iconResId);
-        }
-        if (mSelectedTabIndex > count) {
-            mSelectedTabIndex = count - 1;
-        }
-        setCurrentItem(mSelectedTabIndex);
-        requestLayout();
     }
 
     @Override
@@ -306,9 +258,45 @@ public class FontableTabPageIndicator extends HorizontalScrollView implements Pa
         mListener = listener;
     }
 
+    public void notifyDataSetChanged() {
+        mTabLayout.removeAllViews();
+        PagerAdapter adapter = mViewPager.getAdapter();
+        IconPagerAdapter iconAdapter = null;
+        if (adapter instanceof IconPagerAdapter) {
+            iconAdapter = (IconPagerAdapter) adapter;
+        }
+        final int count = adapter.getCount();
+        for (int i = 0; i < count; i++) {
+            CharSequence title = adapter.getPageTitle(i);
+            if (title == null) {
+                title = EMPTY_TITLE;
+            }
+            int iconResId = 0;
+            if (iconAdapter != null) {
+                iconResId = iconAdapter.getIconResId(i);
+            }
+            addTab(i, title, iconResId);
+        }
+        if (mSelectedTabIndex > count) {
+            mSelectedTabIndex = count - 1;
+        }
+        setCurrentItem(mSelectedTabIndex);
+        requestLayout();
+    }
 
+    /**
+     * Interface for a callback when the selected tab has been reselected.
+     */
+    public interface OnTabReselectedListener {
+        /**
+         * Callback when the selected tab has been reselected.
+         *
+         * @param position Position of the current center item.
+         */
+        void onTabReselected(int position);
+    }
 
-    private class TabView extends FontTextView {
+    class TabView extends FontTextView {
         private int mIndex;
 
         public TabView(Context context) {
@@ -327,10 +315,6 @@ public class FontableTabPageIndicator extends HorizontalScrollView implements Pa
             }
         }
 
-        public int getIndex() {
-            return mIndex;
-        }
-
         @Override
         public void setSelected(boolean selected) {
             super.setSelected(selected);
@@ -340,6 +324,10 @@ public class FontableTabPageIndicator extends HorizontalScrollView implements Pa
             } else {
                 setTypeface(normalText);
             }
+        }
+
+        public int getIndex() {
+            return mIndex;
         }
 
     }

@@ -8,20 +8,17 @@ import android.view.animation.Interpolator;
 import android.widget.Scroller;
 
 import java.lang.reflect.Field;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CustomDurationViewPager extends ViewPager {
+
+    private ScrollerCustomDuration mScroller = null;
 
     public CustomDurationViewPager(Context context) {
         super(context);
         postInitViewPager();
     }
-
-    public CustomDurationViewPager(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        postInitViewPager();
-    }
-
-    private ScrollerCustomDuration mScroller = null;
 
     /**
      * Override the Scroller instance with our own class so we can change the
@@ -36,10 +33,16 @@ public class CustomDurationViewPager extends ViewPager {
             interpolator.setAccessible(true);
 
             mScroller = new ScrollerCustomDuration(getContext(),
-                                                      (Interpolator) interpolator.get(null));
+                    (Interpolator) interpolator.get(null));
             scroller.set(this, mScroller);
         } catch (Exception e) {
+            Logger.getLogger(Logger.GLOBAL_LOGGER_NAME).log(Level.OFF, e.getMessage(), e);
         }
+    }
+
+    public CustomDurationViewPager(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        postInitViewPager();
     }
 
     /**

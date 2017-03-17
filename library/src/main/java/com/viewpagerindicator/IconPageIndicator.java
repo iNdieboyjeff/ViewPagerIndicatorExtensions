@@ -55,21 +55,6 @@ public class IconPageIndicator extends HorizontalScrollView implements PageIndic
         addView(mIconsLayout, new LayoutParams(WRAP_CONTENT, FILL_PARENT, Gravity.CENTER));
     }
 
-    private void animateToIcon(final int position) {
-        final View iconView = mIconsLayout.getChildAt(position);
-        if (mIconSelector != null) {
-            removeCallbacks(mIconSelector);
-        }
-        mIconSelector = new Runnable() {
-            public void run() {
-                final int scrollPos = iconView.getLeft() - (getWidth() - iconView.getWidth()) / 2;
-                smoothScrollTo(scrollPos, 0);
-                mIconSelector = null;
-            }
-        };
-        post(mIconSelector);
-    }
-
     @Override
     public void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -88,13 +73,6 @@ public class IconPageIndicator extends HorizontalScrollView implements PageIndic
     }
 
     @Override
-    public void onPageScrollStateChanged(int arg0) {
-        if (mListener != null) {
-            mListener.onPageScrollStateChanged(arg0);
-        }
-    }
-
-    @Override
     public void onPageScrolled(int arg0, float arg1, int arg2) {
         if (mListener != null) {
             mListener.onPageScrolled(arg0, arg1, arg2);
@@ -106,6 +84,29 @@ public class IconPageIndicator extends HorizontalScrollView implements PageIndic
         setCurrentItem(arg0);
         if (mListener != null) {
             mListener.onPageSelected(arg0);
+        }
+    }
+
+    private void animateToIcon(final int position) {
+        final View iconView = mIconsLayout.getChildAt(position);
+        if (mIconSelector != null) {
+            removeCallbacks(mIconSelector);
+        }
+        mIconSelector = new Runnable() {
+            @Override
+            public void run() {
+                final int scrollPos = iconView.getLeft() - (getWidth() - iconView.getWidth()) / 2;
+                smoothScrollTo(scrollPos, 0);
+                mIconSelector = null;
+            }
+        };
+        post(mIconSelector);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int arg0) {
+        if (mListener != null) {
+            mListener.onPageScrollStateChanged(arg0);
         }
     }
 
@@ -124,22 +125,6 @@ public class IconPageIndicator extends HorizontalScrollView implements PageIndic
         mViewPager = view;
         view.setOnPageChangeListener(this);
         notifyDataSetChanged();
-    }
-
-    public void notifyDataSetChanged() {
-        mIconsLayout.removeAllViews();
-        IconPagerAdapter iconAdapter = (IconPagerAdapter) mViewPager.getAdapter();
-        int count = iconAdapter.getCount();
-        for (int i = 0; i < count; i++) {
-            ImageView view = new ImageView(getContext(), null, R.attr.vpiIconPageIndicatorStyle);
-            view.setImageResource(iconAdapter.getIconResId(i));
-            mIconsLayout.addView(view);
-        }
-        if (mSelectedIndex > count) {
-            mSelectedIndex = count - 1;
-        }
-        setCurrentItem(mSelectedIndex);
-        requestLayout();
     }
 
     @Override
@@ -170,5 +155,22 @@ public class IconPageIndicator extends HorizontalScrollView implements PageIndic
     @Override
     public void setOnPageChangeListener(OnPageChangeListener listener) {
         mListener = listener;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        mIconsLayout.removeAllViews();
+        IconPagerAdapter iconAdapter = (IconPagerAdapter) mViewPager.getAdapter();
+        int count = iconAdapter.getCount();
+        for (int i = 0; i < count; i++) {
+            ImageView view = new ImageView(getContext(), null, R.attr.vpiIconPageIndicatorStyle);
+            view.setImageResource(iconAdapter.getIconResId(i));
+            mIconsLayout.addView(view);
+        }
+        if (mSelectedIndex > count) {
+            mSelectedIndex = count - 1;
+        }
+        setCurrentItem(mSelectedIndex);
+        requestLayout();
     }
 }

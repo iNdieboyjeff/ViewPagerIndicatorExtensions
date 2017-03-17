@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
  * {@link android.widget.FrameLayout} so it can receive the margin.
  */
 public class IcsLinearLayout extends LinearLayout {
-    private static final int[] LL = new int[] {
+    private static final int[] LL = new int[]{
         /* 0 */ android.R.attr.divider,
         /* 1 */ android.R.attr.showDividers,
         /* 2 */ android.R.attr.dividerPadding,
@@ -41,6 +41,7 @@ public class IcsLinearLayout extends LinearLayout {
         a.recycle();
     }
 
+    @Override
     public void setDividerDrawable(Drawable divider) {
         if (divider == mDivider) {
             return;
@@ -55,34 +56,6 @@ public class IcsLinearLayout extends LinearLayout {
         }
         setWillNotDraw(divider == null);
         requestLayout();
-    }
-
-    @Override
-    protected void measureChildWithMargins(View child, int parentWidthMeasureSpec, int widthUsed, int parentHeightMeasureSpec, int heightUsed) {
-        final int index = indexOfChild(child);
-        final int orientation = getOrientation();
-        final LayoutParams params = (LayoutParams) child.getLayoutParams();
-        if (hasDividerBeforeChildAt(index)) {
-            if (orientation == VERTICAL) {
-                //Account for the divider by pushing everything up
-                params.topMargin = mDividerHeight;
-            } else {
-                //Account for the divider by pushing everything left
-                params.leftMargin = mDividerWidth;
-            }
-        }
-
-        final int count = getChildCount();
-        if (index == count - 1) {
-            if (hasDividerBeforeChildAt(count)) {
-                if (orientation == VERTICAL) {
-                    params.bottomMargin = mDividerHeight;
-                } else {
-                    params.rightMargin = mDividerWidth;
-                }
-            }
-        }
-        super.measureChildWithMargins(child, parentWidthMeasureSpec, widthUsed, parentHeightMeasureSpec, heightUsed);
     }
 
     @Override
@@ -113,7 +86,7 @@ public class IcsLinearLayout extends LinearLayout {
 
         if (hasDividerBeforeChildAt(count)) {
             final View child = getChildAt(count - 1);
-            int bottom = 0;
+            int bottom;
             if (child == null) {
                 bottom = getHeight() - getPaddingBottom() - mDividerHeight;
             } else {
@@ -140,7 +113,7 @@ public class IcsLinearLayout extends LinearLayout {
 
         if (hasDividerBeforeChildAt(count)) {
             final View child = getChildAt(count - 1);
-            int right = 0;
+            int right;
             if (child == null) {
                 right = getWidth() - getPaddingRight() - mDividerWidth;
             } else {
@@ -163,9 +136,37 @@ public class IcsLinearLayout extends LinearLayout {
         mDivider.draw(canvas);
     }
 
+    @Override
+    protected void measureChildWithMargins(View child, int parentWidthMeasureSpec, int widthUsed, int parentHeightMeasureSpec, int heightUsed) {
+        final int index = indexOfChild(child);
+        final int orientation = getOrientation();
+        final LayoutParams params = (LayoutParams) child.getLayoutParams();
+        if (hasDividerBeforeChildAt(index)) {
+            if (orientation == VERTICAL) {
+                //Account for the divider by pushing everything up
+                params.topMargin = mDividerHeight;
+            } else {
+                //Account for the divider by pushing everything left
+                params.leftMargin = mDividerWidth;
+            }
+        }
+
+        final int count = getChildCount();
+        if (index == count - 1) {
+            if (hasDividerBeforeChildAt(count)) {
+                if (orientation == VERTICAL) {
+                    params.bottomMargin = mDividerHeight;
+                } else {
+                    params.rightMargin = mDividerWidth;
+                }
+            }
+        }
+        super.measureChildWithMargins(child, parentWidthMeasureSpec, widthUsed, parentHeightMeasureSpec, heightUsed);
+    }
+
     private boolean hasDividerBeforeChildAt(int childIndex) {
         if (childIndex == 0 || childIndex == getChildCount()) {
-          return false;
+            return false;
         }
         if ((mShowDividers & SHOW_DIVIDER_MIDDLE) != 0) {
             boolean hasVisibleViewBefore = false;

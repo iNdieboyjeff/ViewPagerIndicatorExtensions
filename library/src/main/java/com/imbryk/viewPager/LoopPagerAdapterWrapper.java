@@ -21,7 +21,6 @@ import android.os.Parcelable;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerAdapter;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +41,7 @@ public class LoopPagerAdapterWrapper extends PagerAdapter {
     LoopPagerAdapterWrapper(PagerAdapter adapter) {
         this.mAdapter = adapter;
         adapter.registerDataSetObserver(new DataSetObserver() {
+            @Override
             public void onChanged() {
                 notifyDataSetChanged();
             }
@@ -69,8 +69,8 @@ public class LoopPagerAdapterWrapper extends PagerAdapter {
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         int realPosition = (mAdapter instanceof FragmentPagerAdapter || mAdapter instanceof FragmentStatePagerAdapter)
-                               ? position
-                               : toRealPosition(position);
+                ? position
+                : toRealPosition(position);
 
         if (mBoundaryCaching) {
             ToDestroy toDestroy = mToDestroy.get(position);
@@ -103,12 +103,12 @@ public class LoopPagerAdapterWrapper extends PagerAdapter {
         int realFirst = getRealFirstPosition();
         int realLast = getRealLastPosition();
         int realPosition = (mAdapter instanceof FragmentPagerAdapter || mAdapter instanceof FragmentStatePagerAdapter)
-                               ? position
-                               : toRealPosition(position);
+                ? position
+                : toRealPosition(position);
 
         if (mBoundaryCaching && (position == realFirst || position == realLast)) {
             mToDestroy.put(position, new ToDestroy(container, realPosition,
-                                                      object));
+                    object));
         } else {
             mAdapter.destroyItem(container, realPosition, object);
         }

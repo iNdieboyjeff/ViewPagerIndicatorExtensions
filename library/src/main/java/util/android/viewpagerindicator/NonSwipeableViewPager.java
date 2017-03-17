@@ -23,7 +23,6 @@ import android.view.MotionEvent;
 
 /**
  * A view pager that cannot be swiped.
- *
  */
 public class NonSwipeableViewPager extends ViewPager {
 

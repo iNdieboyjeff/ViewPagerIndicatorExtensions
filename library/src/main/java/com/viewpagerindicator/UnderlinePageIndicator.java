@@ -47,30 +47,28 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
     private int mFadeDelay;
     private int mFadeLength;
     private int mFadeBy;
+    private final Runnable mFadeRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!mFades) return;
 
+            final int alpha = Math.max(mPaint.getAlpha() - mFadeBy, 0);
+            mPaint.setAlpha(alpha);
+            invalidate();
+            if (alpha > 0) {
+                postDelayed(this, FADE_FRAME_MS);
+            }
+        }
+    };
     private ViewPager mViewPager;
     private ViewPager.OnPageChangeListener mListener;
     private int mScrollState;
     private int mCurrentPage;
     private float mPositionOffset;
-
     private int mTouchSlop;
     private float mLastMotionX = -1;
     private int mActivePointerId = INVALID_POINTER;
     private boolean mIsDragging;
-
-    private final Runnable mFadeRunnable = new Runnable() {
-      @Override public void run() {
-        if (!mFades) return;
-
-        final int alpha = Math.max(mPaint.getAlpha() - mFadeBy, 0);
-        mPaint.setAlpha(alpha);
-        invalidate();
-        if (alpha > 0) {
-          postDelayed(this, FADE_FRAME_MS);
-        }
-      }
-    };
 
     public UnderlinePageIndicator(Context context) {
         this(context, null);
@@ -102,7 +100,7 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
 
         Drawable background = a.getDrawable(R.styleable.UnderlinePageIndicator_android_background);
         if (background != null) {
-          setBackgroundDrawable(background);
+            setBackgroundDrawable(background);
         }
 
         a.recycle();
@@ -152,32 +150,6 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
     public void setSelectedColor(int selectedColor) {
         mPaint.setColor(selectedColor);
         invalidate();
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        if (mViewPager == null) {
-            return;
-        }
-        final int count = mViewPager.getAdapter().getCount();
-        if (count == 0) {
-            return;
-        }
-
-        if (mCurrentPage >= count) {
-            setCurrentItem(count - 1);
-            return;
-        }
-
-        final int paddingLeft = getPaddingLeft();
-        final float pageWidth = (getWidth() - paddingLeft - getPaddingRight()) / (1f * count);
-        final float left = paddingLeft + pageWidth * (mCurrentPage + mPositionOffset);
-        final float right = left + pageWidth;
-        final float top = getPaddingTop();
-        final float bottom = getHeight() - getPaddingBottom();
-        canvas.drawRect(left, top, right, bottom, mPaint);
     }
 
     public boolean onTouchEvent(MotionEvent ev) {
@@ -264,6 +236,38 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
     }
 
     @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        if (mViewPager == null) {
+            return;
+        }
+        final int count = mViewPager.getAdapter().getCount();
+        if (count == 0) {
+            return;
+        }
+
+        if (mCurrentPage >= count) {
+            setCurrentItem(count - 1);
+            return;
+        }
+
+        final int paddingLeft = getPaddingLeft();
+        final float pageWidth = (getWidth() - paddingLeft - getPaddingRight()) / (1f * count);
+        final float left = paddingLeft + pageWidth * (mCurrentPage + mPositionOffset);
+        final float right = left + pageWidth;
+        final float top = getPaddingTop();
+        final float bottom = (float)getHeight() - getPaddingBottom();
+        canvas.drawRect(left, top, right, bottom, mPaint);
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState() {
+        Parcelable superState = super.onSaveInstanceState();
+        SavedState savedState = new SavedState(superState);
+        savedState.currentPage = mCurrentPage;
+        return savedState;
+    }    @Override
     public void setViewPager(ViewPager viewPager) {
         if (mViewPager == viewPager) {
             return;
@@ -279,7 +283,8 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
         mViewPager.setOnPageChangeListener(this);
         invalidate();
         post(new Runnable() {
-            @Override public void run() {
+            @Override
+            public void run() {
                 if (mFades) {
                     post(mFadeRunnable);
                 }
@@ -288,33 +293,15 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
     }
 
     @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        SavedState savedState = (SavedState) state;
+        super.onRestoreInstanceState(savedState.getSuperState());
+        mCurrentPage = savedState.currentPage;
+        requestLayout();
+    }    @Override
     public void setViewPager(ViewPager view, int initialPosition) {
         setViewPager(view);
         setCurrentItem(initialPosition);
-    }
-
-    @Override
-    public void setCurrentItem(int item) {
-        if (mViewPager == null) {
-            throw new IllegalStateException("ViewPager has not been bound.");
-        }
-        mViewPager.setCurrentItem(item);
-        mCurrentPage = item;
-        invalidate();
-    }
-
-    @Override
-    public void notifyDataSetChanged() {
-        invalidate();
-    }
-
-    @Override
-    public void onPageScrollStateChanged(int state) {
-        mScrollState = state;
-
-        if (mListener != null) {
-            mListener.onPageScrollStateChanged(state);
-        }
     }
 
     @Override
@@ -334,6 +321,14 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
         if (mListener != null) {
             mListener.onPageScrolled(position, positionOffset, positionOffsetPixels);
         }
+    }    @Override
+    public void setCurrentItem(int item) {
+        if (mViewPager == null) {
+            throw new IllegalStateException("ViewPager has not been bound.");
+        }
+        mViewPager.setCurrentItem(item);
+        mCurrentPage = item;
+        invalidate();
     }
 
     @Override
@@ -347,30 +342,33 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
         if (mListener != null) {
             mListener.onPageSelected(position);
         }
+    }    @Override
+    public void notifyDataSetChanged() {
+        invalidate();
     }
 
     @Override
-    public void setOnPageChangeListener(ViewPager.OnPageChangeListener listener) {
-        mListener = listener;
-    }
+    public void onPageScrollStateChanged(int state) {
+        mScrollState = state;
 
-    @Override
-    public void onRestoreInstanceState(Parcelable state) {
-        SavedState savedState = (SavedState)state;
-        super.onRestoreInstanceState(savedState.getSuperState());
-        mCurrentPage = savedState.currentPage;
-        requestLayout();
-    }
-
-    @Override
-    public Parcelable onSaveInstanceState() {
-        Parcelable superState = super.onSaveInstanceState();
-        SavedState savedState = new SavedState(superState);
-        savedState.currentPage = mCurrentPage;
-        return savedState;
+        if (mListener != null) {
+            mListener.onPageScrollStateChanged(state);
+        }
     }
 
     static class SavedState extends BaseSavedState {
+        @SuppressWarnings("UnusedDeclaration")
+        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
         int currentPage;
 
         public SavedState(Parcelable superState) {
@@ -387,18 +385,18 @@ public class UnderlinePageIndicator extends View implements PageIndicator {
             super.writeToParcel(dest, flags);
             dest.writeInt(currentPage);
         }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
-            @Override
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
     }
+
+
+
+    @Override
+    public void setOnPageChangeListener(ViewPager.OnPageChangeListener listener) {
+        mListener = listener;
+    }
+
+
+
+
+
+
 }

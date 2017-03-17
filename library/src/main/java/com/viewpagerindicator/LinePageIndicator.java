@@ -89,7 +89,7 @@ public class LinePageIndicator extends View implements PageIndicator {
 
         Drawable background = a.getDrawable(R.styleable.LinePageIndicator_android_background);
         if (background != null) {
-          setBackgroundDrawable(background);
+            setBackgroundDrawable(background);
         }
 
         a.recycle();
@@ -98,18 +98,12 @@ public class LinePageIndicator extends View implements PageIndicator {
         mTouchSlop = ViewConfigurationCompat.getScaledPagingTouchSlop(configuration);
     }
 
-
-    public void setCentered(boolean centered) {
-        mCentered = centered;
-        invalidate();
-    }
-
     public boolean isCentered() {
         return mCentered;
     }
 
-    public void setUnselectedColor(int unselectedColor) {
-        mPaintUnselected.setColor(unselectedColor);
+    public void setCentered(boolean centered) {
+        mCentered = centered;
         invalidate();
     }
 
@@ -117,8 +111,8 @@ public class LinePageIndicator extends View implements PageIndicator {
         return mPaintUnselected.getColor();
     }
 
-    public void setSelectedColor(int selectedColor) {
-        mPaintSelected.setColor(selectedColor);
+    public void setUnselectedColor(int unselectedColor) {
+        mPaintUnselected.setColor(unselectedColor);
         invalidate();
     }
 
@@ -126,13 +120,22 @@ public class LinePageIndicator extends View implements PageIndicator {
         return mPaintSelected.getColor();
     }
 
-    public void setLineWidth(float lineWidth) {
-        mLineWidth = lineWidth;
+    public void setSelectedColor(int selectedColor) {
+        mPaintSelected.setColor(selectedColor);
         invalidate();
     }
 
     public float getLineWidth() {
         return mLineWidth;
+    }
+
+    public void setLineWidth(float lineWidth) {
+        mLineWidth = lineWidth;
+        invalidate();
+    }
+
+    public float getStrokeWidth() {
+        return mPaintSelected.getStrokeWidth();
     }
 
     public void setStrokeWidth(float lineHeight) {
@@ -141,8 +144,8 @@ public class LinePageIndicator extends View implements PageIndicator {
         invalidate();
     }
 
-    public float getStrokeWidth() {
-        return mPaintSelected.getStrokeWidth();
+    public float getGapWidth() {
+        return mGapWidth;
     }
 
     public void setGapWidth(float gapWidth) {
@@ -150,47 +153,7 @@ public class LinePageIndicator extends View implements PageIndicator {
         invalidate();
     }
 
-    public float getGapWidth() {
-        return mGapWidth;
-    }
-
     @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        if (mViewPager == null) {
-            return;
-        }
-        final int count = mViewPager.getAdapter().getCount();
-        if (count == 0) {
-            return;
-        }
-
-        if (mCurrentPage >= count) {
-            setCurrentItem(count - 1);
-            return;
-        }
-
-        final float lineWidthAndGap = mLineWidth + mGapWidth;
-        final float indicatorWidth = (count * lineWidthAndGap) - mGapWidth;
-        final float paddingTop = getPaddingTop();
-        final float paddingLeft = getPaddingLeft();
-        final float paddingRight = getPaddingRight();
-
-        float verticalOffset = paddingTop + ((getHeight() - paddingTop - getPaddingBottom()) / 2.0f);
-        float horizontalOffset = paddingLeft;
-        if (mCentered) {
-            horizontalOffset += ((getWidth() - paddingLeft - paddingRight) / 2.0f) - (indicatorWidth / 2.0f);
-        }
-
-        //Draw stroked circles
-        for (int i = 0; i < count; i++) {
-            float dx1 = horizontalOffset + (i * lineWidthAndGap);
-            float dx2 = dx1 + mLineWidth;
-            canvas.drawLine(dx1, verticalOffset, dx2, verticalOffset, (i == mCurrentPage) ? mPaintSelected : mPaintUnselected);
-        }
-    }
-
     public boolean onTouchEvent(MotionEvent ev) {
         if (super.onTouchEvent(ev)) {
             return true;
@@ -275,6 +238,49 @@ public class LinePageIndicator extends View implements PageIndicator {
     }
 
     @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+
+        if (mViewPager == null) {
+            return;
+        }
+        final int count = mViewPager.getAdapter().getCount();
+        if (count == 0) {
+            return;
+        }
+
+        if (mCurrentPage >= count) {
+            setCurrentItem(count - 1);
+            return;
+        }
+
+        final float lineWidthAndGap = mLineWidth + mGapWidth;
+        final float indicatorWidth = (count * lineWidthAndGap) - mGapWidth;
+        final float paddingTop = getPaddingTop();
+        final float paddingLeft = getPaddingLeft();
+        final float paddingRight = getPaddingRight();
+
+        float verticalOffset = paddingTop + ((getHeight() - paddingTop - getPaddingBottom()) / 2.0f);
+        float horizontalOffset = paddingLeft;
+        if (mCentered) {
+            horizontalOffset += ((getWidth() - paddingLeft - paddingRight) / 2.0f) - (indicatorWidth / 2.0f);
+        }
+
+        //Draw stroked circles
+        for (int i = 0; i < count; i++) {
+            float dx1 = horizontalOffset + (i * lineWidthAndGap);
+            float dx2 = dx1 + mLineWidth;
+            canvas.drawLine(dx1, verticalOffset, dx2, verticalOffset, (i == mCurrentPage) ? mPaintSelected : mPaintUnselected);
+        }
+    }
+
+    @Override
+    public Parcelable onSaveInstanceState() {
+        Parcelable superState = super.onSaveInstanceState();
+        SavedState savedState = new SavedState(superState);
+        savedState.currentPage = mCurrentPage;
+        return savedState;
+    }    @Override
     public void setViewPager(ViewPager viewPager) {
         if (mViewPager == viewPager) {
             return;
@@ -292,12 +298,21 @@ public class LinePageIndicator extends View implements PageIndicator {
     }
 
     @Override
+    public void onRestoreInstanceState(Parcelable state) {
+        SavedState savedState = (SavedState) state;
+        super.onRestoreInstanceState(savedState.getSuperState());
+        mCurrentPage = savedState.currentPage;
+        requestLayout();
+    }    @Override
     public void setViewPager(ViewPager view, int initialPosition) {
         setViewPager(view);
         setCurrentItem(initialPosition);
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        setMeasuredDimension(measureWidth(widthMeasureSpec), measureHeight(heightMeasureSpec));
+    }    @Override
     public void setCurrentItem(int item) {
         if (mViewPager == null) {
             throw new IllegalStateException("ViewPager has not been bound.");
@@ -307,16 +322,58 @@ public class LinePageIndicator extends View implements PageIndicator {
         invalidate();
     }
 
-    @Override
+    /**
+     * Determines the width of this view
+     *
+     * @param measureSpec A measureSpec packed into an int
+     * @return The width of the view, honoring constraints from measureSpec
+     */
+    private int measureWidth(int measureSpec) {
+        float result;
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
+
+        if ((specMode == MeasureSpec.EXACTLY) || (mViewPager == null)) {
+            //We were told how big to be
+            result = specSize;
+        } else {
+            //Calculate the width according the views count
+            final int count = mViewPager.getAdapter().getCount();
+            result = getPaddingLeft() + getPaddingRight() + (count * mLineWidth) + ((count - 1) * mGapWidth);
+            //Respect AT_MOST value if that was what is called for by measureSpec
+            if (specMode == MeasureSpec.AT_MOST) {
+                result = Math.min(result, specSize);
+            }
+        }
+        return (int) Math.ceil(result);
+    }    @Override
     public void notifyDataSetChanged() {
         invalidate();
     }
 
-    @Override
-    public void onPageScrollStateChanged(int state) {
-        if (mListener != null) {
-            mListener.onPageScrollStateChanged(state);
+    /**
+     * Determines the height of this view
+     *
+     * @param measureSpec A measureSpec packed into an int
+     * @return The height of the view, honoring constraints from measureSpec
+     */
+    private int measureHeight(int measureSpec) {
+        float result;
+        int specMode = MeasureSpec.getMode(measureSpec);
+        int specSize = MeasureSpec.getSize(measureSpec);
+
+        if (specMode == MeasureSpec.EXACTLY) {
+            //We were told how big to be
+            result = specSize;
+        } else {
+            //Measure the height
+            result = mPaintSelected.getStrokeWidth() + getPaddingTop() + getPaddingBottom();
+            //Respect AT_MOST value if that was what is called for by measureSpec
+            if (specMode == MeasureSpec.AT_MOST) {
+                result = Math.min(result, specSize);
+            }
         }
+        return (int) Math.ceil(result);
     }
 
     @Override
@@ -337,85 +394,28 @@ public class LinePageIndicator extends View implements PageIndicator {
     }
 
     @Override
+    public void onPageScrollStateChanged(int state) {
+        if (mListener != null) {
+            mListener.onPageScrollStateChanged(state);
+        }
+    }    @Override
     public void setOnPageChangeListener(ViewPager.OnPageChangeListener listener) {
         mListener = listener;
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        setMeasuredDimension(measureWidth(widthMeasureSpec), measureHeight(heightMeasureSpec));
-    }
-
-    /**
-     * Determines the width of this view
-     *
-     * @param measureSpec
-     *            A measureSpec packed into an int
-     * @return The width of the view, honoring constraints from measureSpec
-     */
-    private int measureWidth(int measureSpec) {
-        float result;
-        int specMode = MeasureSpec.getMode(measureSpec);
-        int specSize = MeasureSpec.getSize(measureSpec);
-
-        if ((specMode == MeasureSpec.EXACTLY) || (mViewPager == null)) {
-            //We were told how big to be
-            result = specSize;
-        } else {
-            //Calculate the width according the views count
-            final int count = mViewPager.getAdapter().getCount();
-            result = getPaddingLeft() + getPaddingRight() + (count * mLineWidth) + ((count - 1) * mGapWidth);
-            //Respect AT_MOST value if that was what is called for by measureSpec
-            if (specMode == MeasureSpec.AT_MOST) {
-                result = Math.min(result, specSize);
-            }
-        }
-        return (int)Math.ceil(result);
-    }
-
-    /**
-     * Determines the height of this view
-     *
-     * @param measureSpec
-     *            A measureSpec packed into an int
-     * @return The height of the view, honoring constraints from measureSpec
-     */
-    private int measureHeight(int measureSpec) {
-        float result;
-        int specMode = MeasureSpec.getMode(measureSpec);
-        int specSize = MeasureSpec.getSize(measureSpec);
-
-        if (specMode == MeasureSpec.EXACTLY) {
-            //We were told how big to be
-            result = specSize;
-        } else {
-            //Measure the height
-            result = mPaintSelected.getStrokeWidth() + getPaddingTop() + getPaddingBottom();
-            //Respect AT_MOST value if that was what is called for by measureSpec
-            if (specMode == MeasureSpec.AT_MOST) {
-                result = Math.min(result, specSize);
-            }
-        }
-        return (int)Math.ceil(result);
-    }
-
-    @Override
-    public void onRestoreInstanceState(Parcelable state) {
-        SavedState savedState = (SavedState)state;
-        super.onRestoreInstanceState(savedState.getSuperState());
-        mCurrentPage = savedState.currentPage;
-        requestLayout();
-    }
-
-    @Override
-    public Parcelable onSaveInstanceState() {
-        Parcelable superState = super.onSaveInstanceState();
-        SavedState savedState = new SavedState(superState);
-        savedState.currentPage = mCurrentPage;
-        return savedState;
-    }
-
     static class SavedState extends BaseSavedState {
+        @SuppressWarnings("UnusedDeclaration")
+        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
+            @Override
+            public SavedState createFromParcel(Parcel in) {
+                return new SavedState(in);
+            }
+
+            @Override
+            public SavedState[] newArray(int size) {
+                return new SavedState[size];
+            }
+        };
         int currentPage;
 
         public SavedState(Parcelable superState) {
@@ -432,18 +432,15 @@ public class LinePageIndicator extends View implements PageIndicator {
             super.writeToParcel(dest, flags);
             dest.writeInt(currentPage);
         }
-
-        @SuppressWarnings("UnusedDeclaration")
-        public static final Creator<SavedState> CREATOR = new Creator<SavedState>() {
-            @Override
-            public SavedState createFromParcel(Parcel in) {
-                return new SavedState(in);
-            }
-
-            @Override
-            public SavedState[] newArray(int size) {
-                return new SavedState[size];
-            }
-        };
     }
+
+
+
+
+
+
+
+
+
+
 }
