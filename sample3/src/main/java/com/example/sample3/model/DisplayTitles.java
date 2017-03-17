@@ -1,23 +1,32 @@
+/*
+ *  Copyright (c) 2015-2016 Jeff Sutton
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 package com.example.sample3.model;
 
-import javax.annotation.Generated;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.os.Parcelable.Creator;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-@Generated("org.jsonschema2pojo")
-public class DisplayTitles implements Parcelable
-{
+import javax.annotation.Generated;
 
-    @SerializedName("title")
-    @Expose
-    private String title;
-    @SerializedName("subtitle")
-    @Expose
-    private String subtitle;
+@Generated("org.jsonschema2pojo")
+public class DisplayTitles implements Parcelable {
+
     public final static Parcelable.Creator<DisplayTitles> CREATOR = new Creator<DisplayTitles>() {
 
 
@@ -32,52 +41,49 @@ public class DisplayTitles implements Parcelable
             return (new DisplayTitles[size]);
         }
 
-    }
-    ;
+    };
+    @SerializedName("title")
+    @Expose
+    private String title;
+    @SerializedName("subtitle")
+    @Expose
+    private String subtitle;
 
     /**
-     * 
-     * @return
-     *     The title
+     * @return The title
      */
     public String getTitle() {
         return title;
     }
 
     /**
-     * 
-     * @param title
-     *     The title
+     * @param title The title
      */
     public void setTitle(String title) {
         this.title = title;
     }
 
     /**
-     * 
-     * @return
-     *     The subtitle
+     * @return The subtitle
      */
     public String getSubtitle() {
         return subtitle;
     }
 
     /**
-     * 
-     * @param subtitle
-     *     The subtitle
+     * @param subtitle The subtitle
      */
     public void setSubtitle(String subtitle) {
         this.subtitle = subtitle;
     }
 
+    public int describeContents() {
+        return 0;
+    }
+
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(title);
         dest.writeValue(subtitle);
-    }
-
-    public int describeContents() {
-        return  0;
     }
 
 }

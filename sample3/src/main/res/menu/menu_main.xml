@@ -1,5 +1,5 @@
 <!--
-  ~  Copyright (c) 2015 Jeff Sutton
+  ~  Copyright (c) 2015-2016 Jeff Sutton
   ~
   ~  Licensed under the Apache License, Version 2.0 (the "License");
   ~  you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
-      tools:context=".MainActivity">
+      tools:context=".activity.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_play"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never"/>
+        android:title="Watch"
+        android:icon="@drawable/ic_play_arrow_white_36dp"
+        app:showAsAction="always"/>
 </menu>

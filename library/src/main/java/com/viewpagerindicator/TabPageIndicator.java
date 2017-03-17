@@ -20,6 +20,7 @@ import android.content.Context;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,26 +38,21 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
  * across different configurations or circumstances.
  */
 public class TabPageIndicator extends HorizontalScrollView implements PageIndicator {
-    /** Title text used when no title is provided by the adapter. */
-    private static final CharSequence EMPTY_TITLE = "";
-
     /**
-     * Interface for a callback when the selected tab has been reselected.
+     * Title text used when no title is provided by the adapter.
      */
-    public interface OnTabReselectedListener {
-        /**
-         * Callback when the selected tab has been reselected.
-         *
-         * @param position Position of the current center item.
-         */
-        void onTabReselected(int position);
-    }
-
+    private static final CharSequence EMPTY_TITLE = "";
+    private final IcsLinearLayout mTabLayout;
     private Runnable mTabSelector;
-
+    private ViewPager mViewPager;
+    private OnPageChangeListener mListener;
+    private int mMaxTabWidth;
+    private int mSelectedTabIndex;
+    private OnTabReselectedListener mTabReselectedListener;
     private final OnClickListener mTabClickListener = new OnClickListener() {
+        @Override
         public void onClick(View view) {
-            TabView tabView = (TabView)view;
+            TabView tabView = (TabView) view;
             final int oldSelected = mViewPager.getCurrentItem();
             final int newSelected = tabView.getIndex();
             mViewPager.setCurrentItem(newSelected);
@@ -65,16 +61,6 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
             }
         }
     };
-
-    private final IcsLinearLayout mTabLayout;
-
-    private ViewPager mViewPager;
-    private OnPageChangeListener mListener;
-
-    private int mMaxTabWidth;
-    private int mSelectedTabIndex;
-
-    private OnTabReselectedListener mTabReselectedListener;
 
     public TabPageIndicator(Context context) {
         this(context, null);
@@ -101,7 +87,7 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
         final int childCount = mTabLayout.getChildCount();
         if (childCount > 1 && (widthMode == MeasureSpec.EXACTLY || widthMode == MeasureSpec.AT_MOST)) {
             if (childCount > 2) {
-                mMaxTabWidth = (int)(MeasureSpec.getSize(widthMeasureSpec) * 0.4f);
+                mMaxTabWidth = (int) (MeasureSpec.getSize(widthMeasureSpec) * 0.4f);
             } else {
                 mMaxTabWidth = MeasureSpec.getSize(widthMeasureSpec) / 2;
             }
@@ -125,6 +111,7 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
             removeCallbacks(mTabSelector);
         }
         mTabSelector = new Runnable() {
+            @Override
             public void run() {
                 final int scrollPos = tabView.getLeft() - (getWidth() - tabView.getWidth()) / 2;
                 smoothScrollTo(scrollPos, 0);
@@ -166,13 +153,6 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
     }
 
     @Override
-    public void onPageScrollStateChanged(int arg0) {
-        if (mListener != null) {
-            mListener.onPageScrollStateChanged(arg0);
-        }
-    }
-
-    @Override
     public void onPageScrolled(int arg0, float arg1, int arg2) {
         if (mListener != null) {
             mListener.onPageScrolled(arg0, arg1, arg2);
@@ -184,6 +164,13 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
         setCurrentItem(arg0);
         if (mListener != null) {
             mListener.onPageSelected(arg0);
+        }
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int arg0) {
+        if (mListener != null) {
+            mListener.onPageScrollStateChanged(arg0);
         }
     }
 
@@ -202,32 +189,6 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
         mViewPager = view;
         view.setOnPageChangeListener(this);
         notifyDataSetChanged();
-    }
-
-    public void notifyDataSetChanged() {
-        mTabLayout.removeAllViews();
-        PagerAdapter adapter = mViewPager.getAdapter();
-        IconPagerAdapter iconAdapter = null;
-        if (adapter instanceof IconPagerAdapter) {
-            iconAdapter = (IconPagerAdapter)adapter;
-        }
-        final int count = adapter.getCount();
-        for (int i = 0; i < count; i++) {
-            CharSequence title = adapter.getPageTitle(i);
-            if (title == null) {
-                title = EMPTY_TITLE;
-            }
-            int iconResId = 0;
-            if (iconAdapter != null) {
-                iconResId = iconAdapter.getIconResId(i);
-            }
-            addTab(i, title, iconResId);
-        }
-        if (mSelectedTabIndex > count) {
-            mSelectedTabIndex = count - 1;
-        }
-        setCurrentItem(mSelectedTabIndex);
-        requestLayout();
     }
 
     @Override
@@ -258,6 +219,45 @@ public class TabPageIndicator extends HorizontalScrollView implements PageIndica
     @Override
     public void setOnPageChangeListener(OnPageChangeListener listener) {
         mListener = listener;
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        mTabLayout.removeAllViews();
+        PagerAdapter adapter = mViewPager.getAdapter();
+        IconPagerAdapter iconAdapter = null;
+        if (adapter instanceof IconPagerAdapter) {
+            iconAdapter = (IconPagerAdapter) adapter;
+        }
+        final int count = adapter.getCount();
+        for (int i = 0; i < count; i++) {
+            CharSequence title = adapter.getPageTitle(i);
+            if (title == null) {
+                title = EMPTY_TITLE;
+            }
+            int iconResId = 0;
+            if (iconAdapter != null) {
+                iconResId = iconAdapter.getIconResId(i);
+            }
+            addTab(i, title, iconResId);
+        }
+        if (mSelectedTabIndex > count) {
+            mSelectedTabIndex = count - 1;
+        }
+        setCurrentItem(mSelectedTabIndex);
+        requestLayout();
+    }
+
+    /**
+     * Interface for a callback when the selected tab has been reselected.
+     */
+    public interface OnTabReselectedListener {
+        /**
+         * Callback when the selected tab has been reselected.
+         *
+         * @param position Position of the current center item.
+         */
+        void onTabReselected(int position);
     }
 
     private class TabView extends TextView {

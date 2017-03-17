@@ -27,7 +27,7 @@ Usage
 2. Add dependencies for ViewPagerIndicatorExtensions.
         
         dependencies {
-            compile(group: 'util.android.viewpagerindicator', name: 'library', version: '1.1.4', ext: 'aar')
+            compile(group: 'util.android.viewpagerindicator', name: 'library', version: '1.1.8', ext: 'aar')
         }
         
         or

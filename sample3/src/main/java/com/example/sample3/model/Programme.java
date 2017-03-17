@@ -1,17 +1,58 @@
+/*
+ *  Copyright (c) 2015-2016 Jeff Sutton
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
 
 package com.example.sample3.model;
 
-import javax.annotation.Generated;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.os.Parcelable.Creator;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-@Generated("org.jsonschema2pojo")
-public class Programme implements Parcelable
-{
+import javax.annotation.Generated;
 
+@Generated("org.jsonschema2pojo")
+public class Programme implements Parcelable {
+
+    public final static Parcelable.Creator<Programme> CREATOR = new Creator<Programme>() {
+
+
+        public Programme createFromParcel(Parcel in) {
+            Programme instance = new Programme();
+            instance.type = ((String) in.readValue((String.class.getClassLoader())));
+            instance.pid = ((String) in.readValue((String.class.getClassLoader())));
+            instance.title = ((String) in.readValue((String.class.getClassLoader())));
+            instance.shortSynopsis = ((String) in.readValue((String.class.getClassLoader())));
+            instance.mediaType = ((String) in.readValue((String.class.getClassLoader())));
+            instance.duration = ((int) in.readValue((int.class.getClassLoader())));
+            instance.image = ((Image) in.readValue((Image.class.getClassLoader())));
+            instance.displayTitles = ((DisplayTitles) in.readValue((DisplayTitles.class.getClassLoader())));
+            instance.firstBroadcastDate = ((String) in.readValue((String.class.getClassLoader())));
+            instance.ownership = ((Ownership) in.readValue((Ownership.class.getClassLoader())));
+            instance.programme = ((Programme_) in.readValue((Programme_.class.getClassLoader())));
+            instance.isAvailableMediasetPcSd = ((boolean) in.readValue((boolean.class.getClassLoader())));
+            instance.isLegacyMedia = ((boolean) in.readValue((boolean.class.getClassLoader())));
+            return instance;
+        }
+
+        public Programme[] newArray(int size) {
+            return (new Programme[size]);
+        }
+
+    };
     @SerializedName("type")
     @Expose
     private String type;
@@ -51,266 +92,191 @@ public class Programme implements Parcelable
     @SerializedName("is_legacy_media")
     @Expose
     private boolean isLegacyMedia;
-    public final static Parcelable.Creator<Programme> CREATOR = new Creator<Programme>() {
-
-
-        public Programme createFromParcel(Parcel in) {
-            Programme instance = new Programme();
-            instance.type = ((String) in.readValue((String.class.getClassLoader())));
-            instance.pid = ((String) in.readValue((String.class.getClassLoader())));
-            instance.title = ((String) in.readValue((String.class.getClassLoader())));
-            instance.shortSynopsis = ((String) in.readValue((String.class.getClassLoader())));
-            instance.mediaType = ((String) in.readValue((String.class.getClassLoader())));
-            instance.duration = ((int) in.readValue((int.class.getClassLoader())));
-            instance.image = ((Image) in.readValue((Image.class.getClassLoader())));
-            instance.displayTitles = ((DisplayTitles) in.readValue((DisplayTitles.class.getClassLoader())));
-            instance.firstBroadcastDate = ((String) in.readValue((String.class.getClassLoader())));
-            instance.ownership = ((Ownership) in.readValue((Ownership.class.getClassLoader())));
-            instance.programme = ((Programme_) in.readValue((Programme_.class.getClassLoader())));
-            instance.isAvailableMediasetPcSd = ((boolean) in.readValue((boolean.class.getClassLoader())));
-            instance.isLegacyMedia = ((boolean) in.readValue((boolean.class.getClassLoader())));
-            return instance;
-        }
-
-        public Programme[] newArray(int size) {
-            return (new Programme[size]);
-        }
-
-    }
-    ;
 
     /**
-     * 
-     * @return
-     *     The type
+     * @return The type
      */
     public String getType() {
         return type;
     }
 
     /**
-     * 
-     * @param type
-     *     The type
+     * @param type The type
      */
     public void setType(String type) {
         this.type = type;
     }
 
     /**
-     * 
-     * @return
-     *     The pid
+     * @return The pid
      */
     public String getPid() {
         return pid;
     }
 
     /**
-     * 
-     * @param pid
-     *     The pid
+     * @param pid The pid
      */
     public void setPid(String pid) {
         this.pid = pid;
     }
 
     /**
-     * 
-     * @return
-     *     The title
+     * @return The title
      */
     public String getTitle() {
         return title;
     }
 
     /**
-     * 
-     * @param title
-     *     The title
+     * @param title The title
      */
     public void setTitle(String title) {
         this.title = title;
     }
 
     /**
-     * 
-     * @return
-     *     The shortSynopsis
+     * @return The shortSynopsis
      */
     public String getShortSynopsis() {
         return shortSynopsis;
     }
 
     /**
-     * 
-     * @param shortSynopsis
-     *     The short_synopsis
+     * @param shortSynopsis The short_synopsis
      */
     public void setShortSynopsis(String shortSynopsis) {
         this.shortSynopsis = shortSynopsis;
     }
 
     /**
-     * 
-     * @return
-     *     The mediaType
+     * @return The mediaType
      */
     public String getMediaType() {
         return mediaType;
     }
 
     /**
-     * 
-     * @param mediaType
-     *     The media_type
+     * @param mediaType The media_type
      */
     public void setMediaType(String mediaType) {
         this.mediaType = mediaType;
     }
 
     /**
-     * 
-     * @return
-     *     The duration
+     * @return The duration
      */
     public int getDuration() {
         return duration;
     }
 
     /**
-     * 
-     * @param duration
-     *     The duration
+     * @param duration The duration
      */
     public void setDuration(int duration) {
         this.duration = duration;
     }
 
     /**
-     * 
-     * @return
-     *     The image
+     * @return The image
      */
     public Image getImage() {
         return image;
     }
 
     /**
-     * 
-     * @param image
-     *     The image
+     * @param image The image
      */
     public void setImage(Image image) {
         this.image = image;
     }
 
     /**
-     * 
-     * @return
-     *     The displayTitles
+     * @return The displayTitles
      */
     public DisplayTitles getDisplayTitles() {
         return displayTitles;
     }
 
     /**
-     * 
-     * @param displayTitles
-     *     The display_titles
+     * @param displayTitles The display_titles
      */
     public void setDisplayTitles(DisplayTitles displayTitles) {
         this.displayTitles = displayTitles;
     }
 
     /**
-     * 
-     * @return
-     *     The firstBroadcastDate
+     * @return The firstBroadcastDate
      */
     public String getFirstBroadcastDate() {
         return firstBroadcastDate;
     }
 
     /**
-     * 
-     * @param firstBroadcastDate
-     *     The first_broadcast_date
+     * @param firstBroadcastDate The first_broadcast_date
      */
     public void setFirstBroadcastDate(String firstBroadcastDate) {
         this.firstBroadcastDate = firstBroadcastDate;
     }
 
     /**
-     * 
-     * @return
-     *     The ownership
+     * @return The ownership
      */
     public Ownership getOwnership() {
         return ownership;
     }
 
     /**
-     * 
-     * @param ownership
-     *     The ownership
+     * @param ownership The ownership
      */
     public void setOwnership(Ownership ownership) {
         this.ownership = ownership;
     }
 
     /**
-     * 
-     * @return
-     *     The programme
+     * @return The programme
      */
     public Programme_ getProgramme() {
         return programme;
     }
 
     /**
-     * 
-     * @param programme
-     *     The programme
+     * @param programme The programme
      */
     public void setProgramme(Programme_ programme) {
         this.programme = programme;
     }
 
     /**
-     * 
-     * @return
-     *     The isAvailableMediasetPcSd
+     * @return The isAvailableMediasetPcSd
      */
     public boolean isIsAvailableMediasetPcSd() {
         return isAvailableMediasetPcSd;
     }
 
     /**
-     * 
-     * @param isAvailableMediasetPcSd
-     *     The is_available_mediaset_pc_sd
+     * @param isAvailableMediasetPcSd The is_available_mediaset_pc_sd
      */
     public void setIsAvailableMediasetPcSd(boolean isAvailableMediasetPcSd) {
         this.isAvailableMediasetPcSd = isAvailableMediasetPcSd;
     }
 
     /**
-     * 
-     * @return
-     *     The isLegacyMedia
+     * @return The isLegacyMedia
      */
     public boolean isIsLegacyMedia() {
         return isLegacyMedia;
     }
 
     /**
-     * 
-     * @param isLegacyMedia
-     *     The is_legacy_media
+     * @param isLegacyMedia The is_legacy_media
      */
     public void setIsLegacyMedia(boolean isLegacyMedia) {
         this.isLegacyMedia = isLegacyMedia;
+    }
+
+    public int describeContents() {
+        return 0;
     }
 
     public void writeToParcel(Parcel dest, int flags) {
@@ -327,10 +293,6 @@ public class Programme implements Parcelable
         dest.writeValue(programme);
         dest.writeValue(isAvailableMediasetPcSd);
         dest.writeValue(isLegacyMedia);
-    }
-
-    public int describeContents() {
-        return  0;
     }
 
 }

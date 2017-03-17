@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
-  ~  Copyright (c) 2015 Jeff Sutton
+  ~  Copyright (c) 2015-2016 Jeff Sutton
   ~
   ~  Licensed under the Apache License, Version 2.0 (the "License");
   ~  you may not use this file except in compliance with the License.
@@ -14,12 +15,6 @@
   ~  limitations under the License.
   -->
 
-<fragment android:id="@+id/fragment"
-          android:name="com.example.sample3.MainActivityFragment"
-          xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:app="http://schemas.android.com/apk/res-auto"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          app:layout_behavior="@string/appbar_scrolling_view_behavior"
-          tools:layout="@layout/fragment_main"/>
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:height="36dp" android:viewportHeight="24.0" android:viewportWidth="24.0" android:width="36dp">
+    <path android:fillColor="#FFFFFF" android:pathData="M8,5v14l11,-7z"/>
+</vector>
